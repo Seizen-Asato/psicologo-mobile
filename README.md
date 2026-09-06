@@ -44,11 +44,16 @@ Posibilidad de exportar listado filtrado.
 
 - Una vista donde el terapeuta define sus rangos de atención (ej. Lunes a Jueves de 14 a 19 hs), bloquea días por vacaciones o cancela/reprograma turnos existentes con un toque.
 
---4 Link de Google Calendar: Genera un enlace para que el paciente guarde la sesión en su calendario   personal con un clic.
+--4 Link de Google Calendar: Genera un enlace para que el paciente guarde la sesión en su calendario personal con un clic.
+
 --5 Plantillas de WhatsApp: Abre un chat con mensajes prearmados (recordatorio, demora, confirmación) sin tipear a mano.
+
 --6 Notas por Voz (Dictado): Transcribe lo que el terapeuta habla al terminar la sesión usando el micrófono del dispositivo.
+
 --7 Pacientes Inactivos (Archivo): Oculta de la vista diaria a quienes pausaron o finalizaron tratamiento sin borrar su historial.
+
 --8 Confirmación de Turno: Permite validar con un toque si el paciente asiste para asegurar la agenda del día.
+
 --9 Buscador Rápido por DNI o Teléfono: Permite localizar a un paciente escribiendo su número de documento o celular en la barra superior.
 
 # Aviso
