@@ -1,13 +1,13 @@
 import { View } from "react-native";
-import Calender from "../screen/AgendaScreen";
+import LoginForm from "../components/LoginForm";
 import Nav from "./Nav";
 
-export default function Index() {
+export default function Login() {
   return (
     <View style={{ flexDirection: "row", flex: 1 }}>
       <Nav />
       <View style={{ flex: 1 }}>
-        <Calender />
+        <LoginForm />
       </View>
     </View>
   );
