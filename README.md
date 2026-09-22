@@ -40,7 +40,7 @@ Visualización con etiquetas de colores (verde = activo, amarillo = pendiente, r
 
 Posibilidad de exportar listado filtrado.
 
---3 . Panel de gestión de agenda y disponibilidad
+--3 . Panel de gestión de agenda
 
 - Una vista donde el terapeuta define sus rangos de atención (ej. Lunes a Jueves de 14 a 19 hs), bloquea días por vacaciones o cancela/reprograma turnos existentes con un toque.
 
@@ -49,6 +49,8 @@ Posibilidad de exportar listado filtrado.
 --5 Confirmación de Turno: Permite validar con un toque si el paciente asiste para asegurar la agenda del día.
 
 --6 Buscador Rápido por DNI o Teléfono: Permite localizar a un paciente escribiendo su número de documento o celular en la barra superior.
+
+--7 Filtrado de turnos por fecha: en la agenda poens una fecha como parametro y se filtra mostrandose en el calendario.
 
 # Aviso
 

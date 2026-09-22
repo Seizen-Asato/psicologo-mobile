@@ -1,48 +1,38 @@
 import { fetchApi } from "./apiClient";
-
-const BASE_URL = "http://192.168.100.36:5008/api/agenda"; // tu IP local
+import { BASE_URL } from "./baseUrl";
 
 export async function getAll() {
-  return fetchApi(BASE_URL);
+  return fetchApi(`${BASE_URL}/agenda`);
 }
 
 export async function getByDate(date) {
-  return fetchApi(`${BASE_URL}/${date}`);
+  return fetchApi(`${BASE_URL}/agenda/${date}`);
 }
 
 export async function getById(id) {
-  return fetchApi(`${BASE_URL}/${id}`);
+  return fetchApi(`${BASE_URL}/agenda/${id}`);
 }
 
 export async function getByPatient(id) {
-  return fetchApi(`http://192.168.100.36:5008/api/${id}/paciente`);
+  return fetchApi(`${BASE_URL}/${id}/paciente`);
 }
 
 export async function create(data) {
-  return fetchApi(BASE_URL, {
+  return fetchApi(`${BASE_URL}/agenda`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
 }
 
 export async function update(data) {
-  return fetchApi(BASE_URL, {
+  return fetchApi(`${BASE_URL}/agenda`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
 }
 
 export async function remove(id) {
-  return fetchApi(`${BASE_URL}/${id}`, {
+  return fetchApi(`${BASE_URL}/agenda/${id}`, {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
   });
 }

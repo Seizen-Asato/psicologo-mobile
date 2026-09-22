@@ -11,6 +11,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
   const [horaInicio, setHoraInicio] = useState("");
   const [horaFin, setHoraFin] = useState("");
   const [psicologoId, setPsicologoId] = useState<number>(0);
+  const [descripcion, setDescripcion] = useState<string>("");
 
   const handleSubmit = async () => {
     const newAgenda: AgendaDto = {
@@ -23,6 +24,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
       horaInicio,
       horaFin,
       fecha,
+      descripcion,
     };
 
     await onCreate(newAgenda);
@@ -50,6 +52,12 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
         placeholder="Hora fin (HH:mm)"
         value={horaFin}
         onChangeText={setHoraFin}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+      />
+      <TextInput
+        placeholder="Descripción"
+        value={descripcion}
+        onChangeText={setDescripcion}
         style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
       <TextInput

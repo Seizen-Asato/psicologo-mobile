@@ -1,50 +1,58 @@
-import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Text, View } from "react-native";
 import AgendaForm from "../components/AgendaForm";
 import CalenderView from "../components/CalenderView";
 import { AgendaDto } from "../models/AgendaDto";
 import { create, getAll } from "../services/calendarService";
 
 const AgendaScreen = () => {
-  const [agenda, setAgenda] = useState<AgendaDto[]>([]);
-  const [events, setEvents] = useState<
-    { id: number; title: string; start: Date; end: Date }[]
-  >([]);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const data = await getAll();
-        if (!data || !Array.isArray(data)) return;
+  const {
+    data: agenda = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["agenda"],
+    queryFn: getAll,
+  });
 
-        setAgenda(data);
-        const formattedEvents = data.map((a) => ({
-          id: a.agendaId,
-          title: `${a.psicologoNombre} ${a.psicologoApellido}`,
-          start: new Date(`${a.fecha}T${a.horaInicio}`),
-          end: new Date(`${a.fecha}T${a.horaFin}`),
-        }));
-        setEvents(formattedEvents);
-      } catch (error) {
-        console.error("Error al cargar agendas:", error);
-      }
-    }
-    fetchEvents();
-  }, []);
+  const createAgendaMutation = useMutation({
+    mutationFn: (agenda: AgendaDto) => create(agenda),
+    onSuccess: (newAgenda) => {
+      //aca se  actualiza cache de agendas
+      queryClient.setQueryData(["agenda"], (old: AgendaDto[] = []) => [
+        ...old,
+        newAgenda,
+      ]);
+    },
+  });
 
   const handleCreateAgenda = async (agenda: AgendaDto) => {
-    const newAgenda = await create(agenda);
-    setAgenda((prev) => [...prev, newAgenda]);
-    setEvents((prev) => [
-      ...prev,
-      {
-        id: newAgenda.agendaId,
-        title: `${newAgenda.psicologoNombre} ${newAgenda.psicologoApellido}`,
-        start: new Date(`${newAgenda.fecha}T${newAgenda.horaInicio}`),
-        end: new Date(`${newAgenda.fecha}T${newAgenda.horaFin}`),
-      },
-    ]);
+    await createAgendaMutation.mutateAsync(agenda);
   };
+
+  const events =
+    agenda?.map((a: AgendaDto) => ({
+      id: a.agendaId,
+      title: `${a.psicologoNombre} ${a.psicologoApellido}`,
+      start: new Date(`${a.fecha}T${a.horaInicio}`),
+      end: new Date(`${a.fecha}T${a.horaFin}`),
+      descripcion: a.descripcion,
+    })) ?? [];
+
+  if (isLoading)
+    return (
+      <View>
+        <Text>Cargando...</Text>
+      </View>
+    );
+  if (error)
+    return (
+      <View>
+        <Text>Error al cargar agendas</Text>
+      </View>
+    );
 
   return (
     <View style={{ flex: 1, padding: 10 }}>

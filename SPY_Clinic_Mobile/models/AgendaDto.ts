@@ -8,4 +8,5 @@ export interface AgendaDto {
   horaInicio: string;
   horaFin: string;
   fecha: string;
+  descripcion: string;
 }

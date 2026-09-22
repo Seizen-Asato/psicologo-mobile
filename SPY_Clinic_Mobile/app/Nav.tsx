@@ -13,7 +13,7 @@ function Nav() {
     <View style={styles.sideNav}>
       <View style={styles.sideNavList}>
         <View style={styles.sideNavItem}>
-          <Link href="/" asChild>
+          <Link href="/home" asChild>
             <Pressable>
               <Text style={styles.sideNavLink}>Inicio</Text>
             </Pressable>

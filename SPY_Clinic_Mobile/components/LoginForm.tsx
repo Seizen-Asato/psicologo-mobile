@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -12,7 +13,7 @@ import { Login } from "../services/authService";
 const LoginMobile = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const router = useRouter();
   const handleLogin = async () => {
     if (!email || !password) {
       return Alert.alert("Error", "Faltan datos");
@@ -26,6 +27,7 @@ const LoginMobile = () => {
       // await SecureStore.setItemAsync("token", data.token);
 
       console.log("Login exitoso", data);
+      router.replace("/home");
     } catch (error: any) {
       Alert.alert("Error", error.message);
     }
