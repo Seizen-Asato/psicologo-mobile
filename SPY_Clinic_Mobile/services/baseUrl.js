@@ -1,26 +1,17 @@
 import * as Device from "expo-device";
 import { Platform } from "react-native";
 
-const API_URL_DEVICE = process.env.EXPO_PUBLIC_API_URL_DEVICE;
-const API_URL_EMULATOR = process.env.EXPO_PUBLIC_API_URL_EMULATOR;
-const API_URL_WEB = process.env.EXPO_PUBLIC_API_URL_WEB;
-
-let baseUrl;
+let BASE_URL;
 
 if (Platform.OS === "android" && !Device.isDevice) {
-  baseUrl = API_URL_EMULATOR;
+  // Emulador Android
+  BASE_URL = "http://10.0.2.2:5008/api";
 } else if (Platform.OS === "web") {
-  baseUrl = API_URL_WEB;
+  // Web
+  BASE_URL = "http://localhost:5008/api";
 } else {
-  baseUrl = API_URL_DEVICE;
+  // Dispositivo físico
+  BASE_URL = "http://192.168.100.36:5008/api";
 }
-
-if (!baseUrl) {
-  throw new Error(
-    "Falta configurar la URL de la API. Revisa las variables EXPO_PUBLIC_API_URL_* en el archivo .env."
-  );
-}
-
-const BASE_URL = baseUrl;
 
 export { BASE_URL };
