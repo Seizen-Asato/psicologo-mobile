@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { Button, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
-import CalendarFilter from "../components/CalenderFilter";
+import TurnoFiltradoForm from "../components/TurnoFiltradoForm";
 
 interface CalendarViewProps {
   events: { id: number; title: string; start: Date; end: Date }[];
   getByDate: (date: string) => Promise<any>;
   getByPatient: (id: string) => Promise<any>;
+  getByTurno?: (id: string) => Promise<any>;
+  getByTurnoPaciente?: (id: string) => Promise<any>;
+  getByTurnoPacienteId?: (id: string) => Promise<any>;
   reload: () => void;
 }
 
@@ -14,6 +17,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   events,
   getByDate,
   getByPatient,
+  getByTurno,
+  getByTurnoPaciente,
+  getByTurnoPacienteId,
   reload,
 }) => {
   const [mode, setMode] = useState<"month" | "week" | "day">("week");
@@ -29,20 +35,34 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   const handleFilter = async ({
     date,
     patientId,
+    turnoId,
+    turnoPaciente,
+    turnoPacienteId,
   }: {
     date?: string;
     patientId?: string;
+    turnoId?: string;
+    turnoPaciente?: string;
+    turnoPacienteId?: string;
   }) => {
+    let response;
+
     if (date) {
-      const response = await getByDate(date);
-      setFilteredEvents(response);
+      response = await getByDate(date);
     } else if (patientId) {
-      const response = await getByPatient(patientId);
-      setFilteredEvents(response);
+      response = await getByPatient(patientId);
+    } else if (turnoId && getByTurno) {
+      response = await getByTurno(turnoId);
+    } else if (turnoPaciente && getByTurnoPaciente) {
+      response = await getByTurnoPaciente(turnoPaciente);
+    } else if (turnoPacienteId && getByTurnoPacienteId) {
+      response = await getByTurnoPacienteId(turnoPacienteId);
     } else {
       reload();
-      setFilteredEvents(events);
+      response = events;
     }
+
+    setFilteredEvents(response);
   };
 
   const handleReset = () => {
@@ -52,7 +72,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <CalendarFilter onFilter={handleFilter} onReset={handleReset} />
+      <TurnoFiltradoForm onFilter={handleFilter} onReset={handleReset} />
 
       <View
         style={{
@@ -78,6 +98,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         <Button title="Siguiente" onPress={goToNextDay} />
       </View>
 
+      {/* Calendario */}
       <Calendar
         events={filteredEvents}
         height={600}

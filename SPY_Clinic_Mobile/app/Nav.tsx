@@ -54,20 +54,34 @@ function Nav() {
   );
 }
 
+// aunque vamos a usar styled.components esto es provisorio ya que hay unos problemas al usar styled. components pero
+// por ahora nos enfocaremso en otras coas antes que el diseño
+
 const styles = StyleSheet.create({
   sideNav: {
-    padding: 20,
-    backgroundColor: "#f8f9fa",
+    height: 60,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    backgroundColor: "#000000",
+    paddingHorizontal: 10,
+    elevation: 4,
   },
   sideNavList: {
-    flexDirection: "column",
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
   },
   sideNavItem: {
-    marginVertical: 10,
+    marginHorizontal: 5,
+    flexShrink: 1,
   },
   sideNavLink: {
     fontSize: 16,
     color: "#007bff",
+    fontWeight: "500",
+    textAlign: "center",
   },
 });
 
