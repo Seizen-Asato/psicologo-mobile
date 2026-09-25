@@ -14,6 +14,9 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
   const [descripcion, setDescripcion] = useState<string>("");
 
   const handleSubmit = async () => {
+    const horaInicioFormatted =
+      horaInicio.length === 5 ? `${horaInicio}:00` : horaInicio;
+    const horaFinFormatted = horaFin.length === 5 ? `${horaFin}:00` : horaFin;
     const newAgenda: AgendaDto = {
       agendaId: 0,
       psicologoId,
@@ -21,8 +24,8 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
       psicologoApellido: "",
       consultorioId: 1,
       diaSemana: "",
-      horaInicio,
-      horaFin,
+      horaInicio: horaInicioFormatted,
+      horaFin: horaFinFormatted,
       fecha,
       descripcion,
     };

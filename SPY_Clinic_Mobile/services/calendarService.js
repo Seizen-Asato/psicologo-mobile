@@ -18,16 +18,29 @@ export async function getByPatient(id) {
 }
 
 export async function create(data) {
+  const payload = {
+    ...data,
+    horaInicio:
+      data.horaInicio.length === 5 ? `${data.horaInicio}:00` : data.horaInicio,
+    horaFin: data.horaFin.length === 5 ? `${data.horaFin}:00` : data.horaFin,
+  };
   return fetchApi(`${BASE_URL}/agenda`, {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
 }
 
 export async function update(data) {
+  const payload = {
+    ...data,
+    horaInicio:
+      data.horaInicio.length === 5 ? `${data.horaInicio}:00` : data.horaInicio,
+    horaFin: data.horaFin.length === 5 ? `${data.horaFin}:00` : data.horaFin,
+  };
+
   return fetchApi(`${BASE_URL}/agenda`, {
     method: "PUT",
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
 }
 
