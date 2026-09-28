@@ -31,6 +31,8 @@ Campo de búsqueda con autocompletado (para evitar errores de tipeo).
 
 Filtrado dinámico que muestra resultados mientras se escribe.
 
+## por hacer, recien empezando
+
 --2 . Filtro de búsqueda por Letra de la A-Z y por Estado Paciente
 Permite consultar rápidamente el estado administrativo o clínico del paciente (ejemplo: autorizado, pendiente, en tratamiento activo, dado de alta).
 
@@ -40,17 +42,25 @@ Visualización con etiquetas de colores (verde = activo, amarillo = pendiente, r
 
 Posibilidad de exportar listado filtrado.
 
+## por hacer recien empezando
+
 --3 . Panel de gestión de agenda
 
 - Una vista donde el terapeuta define sus rangos de atención (ej. Lunes a Jueves de 14 a 19 hs), bloquea días por vacaciones o cancela/reprograma turnos existentes con un toque.
 
+## En progreso casi terminado, faltan algunos detalles por agregar y solcuionar pero el 75% de la diea esta, y esta diseñado para que a futuro se puedan ir agregando mas componentes que hacen falta pero en si la estructura esta
+
 --4 Plantillas de WhatsApp: Abre un chat con mensajes prearmados (recordatorio, demora, confirmación) sin tipear a mano.
+
+## por hacer no emepzado aun
 
 --5 Confirmación de Turno: Permite validar con un toque si el paciente asiste para asegurar la agenda del día.
 
---6 Buscador Rápido por DNI o Teléfono: Permite localizar a un paciente escribiendo su número de documento o celular en la barra superior.
+## por hacer, no empezadoa aun
 
---7 Filtrado de turnos por fecha: en la agenda poens una fecha como parametro y se filtra mostrandose en el calendario.
+--6 Filtrado de turnos por fecha: en la agenda poens una fecha como parametro y se filtra mostrandose en el calendario.
+
+## Hecho, falta solcuionar problemas en si de la creacion de turnos pero la logica dle filtrado esta
 
 # Aviso
 
