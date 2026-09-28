@@ -1,5 +1,4 @@
 import { Link } from "expo-router";
-import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 // podemos separa la logica en las carpetas de cada funcionameinto para que sea mas ordenado, pero lo que pongamos en el nav
@@ -7,8 +6,6 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 // la funciuonaldiad de cada carpeta
 
 function Nav() {
-  const [showLogout, setShowLogout] = useState(false);
-
   return (
     <View style={styles.sideNav}>
       <View style={styles.sideNavList}>
@@ -43,12 +40,6 @@ function Nav() {
             </Pressable>
           </Link>
         </View>
-
-        <View style={styles.sideNavItem}>
-          <Pressable onPress={() => setShowLogout(true)}>
-            <Text style={styles.sideNavLink}>Cerrar sesión</Text>
-          </Pressable>
-        </View>
       </View>
     </View>
   );
@@ -63,7 +54,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    backgroundColor: "#000000",
+    backgroundColor: "#242222",
     paddingHorizontal: 10,
     elevation: 4,
   },

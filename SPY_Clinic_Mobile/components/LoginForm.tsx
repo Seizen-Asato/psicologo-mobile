@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
+import { useAuthStore } from "../context/Auth";
 import { Login } from "../services/authService";
 import {
   ButtonText,
@@ -17,6 +18,7 @@ const LoginMobile = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const login = useAuthStore((state) => state.login);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -26,6 +28,7 @@ const LoginMobile = () => {
     try {
       const data = await Login(email, password);
       console.log("Login exitoso", data);
+      login({ id: data.user.id, email: data.user.email }, data.token);
       router.replace("/home");
     } catch (error: any) {
       Alert.alert("Error", error.message);

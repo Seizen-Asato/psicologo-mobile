@@ -47,3 +47,11 @@ Permite ingresar datos (fecha, horaInicio, horaFin, etc.).
 Al enviar, llama a agendaService.createAgenda.
 
 Actualiza el estado en AgendaScreen para refrescar el calendario.
+
+## Cosas a averiguar y corregir
+
+--El nav tarda en acceder, hay que ver por que esta lento y ver como solucionarlo
+
+--Agregar apntallas de carga y mensajes de validadciones
+
+--Solucionar los problemas d epor que no se puede usar styled.components

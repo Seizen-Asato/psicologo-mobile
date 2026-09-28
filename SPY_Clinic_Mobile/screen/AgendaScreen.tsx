@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import AgendaForm from "../components/AgendaForm";
 import CalenderView from "../components/CalenderView";
 import { AgendaDto } from "../models/AgendaDto";
@@ -25,7 +25,6 @@ const AgendaScreen = () => {
   const createAgendaMutation = useMutation({
     mutationFn: (agenda: AgendaDto) => create(agenda),
     onSuccess: (newAgenda) => {
-      //aca se  actualiza cache de agendas
       queryClient.setQueryData(["agenda"], (old: AgendaDto[] = []) => [
         ...old,
         newAgenda,
@@ -56,21 +55,27 @@ const AgendaScreen = () => {
 
   if (isLoading)
     return (
-      <View>
-        <Text>Cargando...</Text>
+      <View style={styles.feedback}>
+        <ActivityIndicator size="large" color="#007bff" />
+        <Text style={styles.feedbackText}>Cargando agendas...</Text>
       </View>
     );
+
   if (error)
     return (
-      <View>
-        <Text>Error al cargar agendas</Text>
+      <View style={styles.feedback}>
+        <Text style={[styles.feedbackText, { color: "red" }]}>
+          Error al cargar agendas
+        </Text>
       </View>
     );
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
+    <View style={styles.container}>
+      <Text style={styles.title}>Agenda de Psicólogos</Text>
+
       <AgendaForm onCreate={handleCreateAgenda} />
-      {/*se apsan los meotods como props*/}
+
       <CalenderView
         events={events}
         getByDate={handleGetByDate}
@@ -79,9 +84,33 @@ const AgendaScreen = () => {
           void queryClient.invalidateQueries({ queryKey: ["agenda"] });
         }}
       />
-      {/*se apsan los meotods como props*/}
     </View>
   );
 };
 
 export default AgendaScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#f9f9f9",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 12,
+    color: "#333",
+    textAlign: "center",
+  },
+  feedback: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  feedbackText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#555",
+  },
+});
