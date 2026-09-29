@@ -18,7 +18,7 @@ export default function RegisterScreen() {
     email: "",
     password: "",
     consultorio: "",
-    role: "Psicólogo",
+    rol: "Psicólogo",
   });
 
   const router = useRouter();

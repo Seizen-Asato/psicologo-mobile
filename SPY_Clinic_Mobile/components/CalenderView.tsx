@@ -34,13 +34,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
   const handleFilter = async ({
     date,
-    patientId,
+    pacienteId,
     turnoId,
     turnoPaciente,
     turnoPacienteId,
   }: {
     date?: string;
-    patientId?: string;
+    pacienteId?: string;
     turnoId?: string;
     turnoPaciente?: string;
     turnoPacienteId?: string;
@@ -49,8 +49,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
     if (date) {
       response = await getByDate(date);
-    } else if (patientId) {
-      response = await getByPatient(patientId);
+    } else if (pacienteId) {
+      response = await getByPatient(pacienteId);
     } else if (turnoId && getByTurno) {
       response = await getByTurno(turnoId);
     } else if (turnoPaciente && getByTurnoPaciente) {

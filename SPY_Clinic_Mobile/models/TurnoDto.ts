@@ -1,5 +1,5 @@
 export interface TurnoDto {
-  turnoID?: string;
+  turnoId?: string;
   fecha: string;
   hora: string;
   estado: "pendiente" | "confirmado" | "cancelado";
@@ -8,8 +8,8 @@ export interface TurnoDto {
   modalidadVirtual: boolean;
   url?: string | null;
   cantidadTurnos: number;
-  psicologoID: string;
-  pacienteID: string;
-  planTurnoID: string;
+  psicologoId: string;
+  pacienteId: string;
+  planTurnoId: string;
   descripcion: string;
 }

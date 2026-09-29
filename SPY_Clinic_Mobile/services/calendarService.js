@@ -6,7 +6,7 @@ export async function getAll() {
 }
 
 export async function getByDate(date) {
-  return fetchApi(`${BASE_URL}/agenda/${date}`);
+  return fetchApi(`${BASE_URL}/agenda?fecha${date}`);
 }
 
 export async function getById(id) {
@@ -14,7 +14,7 @@ export async function getById(id) {
 }
 
 export async function getByPatient(id) {
-  return fetchApi(`${BASE_URL}/${id}/paciente`);
+  return fetchApi(`${BASE_URL}/paciente/${id}`);
 }
 
 export async function create(data) {

@@ -27,8 +27,8 @@ export default function TurnoScreen({ selectedTurno }: TurnoScreenProps) {
   });
 
   const handleSave = (turno: TurnoDto) => {
-    if (selectedTurno?.turnoID) {
-      updateMutation.mutate({ id: selectedTurno.turnoID, data: turno });
+    if (selectedTurno?.turnoId) {
+      updateMutation.mutate({ id: selectedTurno.turnoId, data: turno });
     } else {
       createMutation.mutate(turno);
     }

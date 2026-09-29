@@ -4,7 +4,7 @@ import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 interface TurnoFiltradoFormProps {
   onFilter: (filters: {
     date?: string;
-    patientId?: string;
+    pacienteId?: string;
     turnoId?: string;
     turnoPaciente?: string;
     turnoPacienteId?: string;
@@ -17,35 +17,36 @@ const TurnoFiltradoForm: React.FC<TurnoFiltradoFormProps> = ({
   onReset,
 }) => {
   const [date, setDate] = useState("");
-  const [patientId, setPatientId] = useState("");
+  const [pacienteId, setPacienteId] = useState("");
   const [turnoId, setTurnoId] = useState("");
   const [turnoPaciente, setTurnoPaciente] = useState("");
   const [turnoPacienteId, setTurnoPacienteId] = useState("");
 
   const handleSubmit = () => {
-    onFilter({ date, patientId, turnoId, turnoPaciente, turnoPacienteId });
+    onFilter({ date, pacienteId, turnoId, turnoPaciente, turnoPacienteId });
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Filtrado</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Fecha (YYYY-MM-DD)"
-        value={date}
-        onChangeText={setDate}
-      />
+
       <TextInput
         style={styles.input}
         placeholder="Paciente ID"
-        value={patientId}
-        onChangeText={setPatientId}
+        value={pacienteId}
+        onChangeText={setPacienteId}
       />
       <TextInput
         style={styles.input}
         placeholder="Turno ID"
         value={turnoId}
         onChangeText={setTurnoId}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Fecha (YYYY-MM-DD)"
+        value={date}
+        onChangeText={setDate}
       />
       <TextInput
         style={styles.input}
