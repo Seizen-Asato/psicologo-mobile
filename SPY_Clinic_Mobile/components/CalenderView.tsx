@@ -1,19 +1,12 @@
+import { useFiltroTurnos } from "@/hooks/useTurnoFilter";
+import { EventoDto } from "@/models/EventoDto";
+import { FiltroTurnosProps } from "@/models/FiltroTurnosProps";
 import React, { useState } from "react";
-import { Button, View } from "react-native";
+import { Button, Text, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
 import TurnoFiltradoForm from "../components/TurnoFiltradoForm";
 
-interface CalendarViewProps {
-  events: { id: number; title: string; start: Date; end: Date }[];
-  getByDate: (date: string) => Promise<any>;
-  getByPatient: (id: string) => Promise<any>;
-  getByTurno?: (id: string) => Promise<any>;
-  getByTurnoPaciente?: (id: string) => Promise<any>;
-  getByTurnoPacienteId?: (id: string) => Promise<any>;
-  reload: () => void;
-}
-
-const CalendarView: React.FC<CalendarViewProps> = ({
+const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
   events,
   getByDate,
   getByPatient,
@@ -24,55 +17,21 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 }) => {
   const [mode, setMode] = useState<"month" | "week" | "day">("week");
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [filteredEvents, setFilteredEvents] = useState(events);
 
-  const goToToday = () => setCurrentDate(new Date());
-  const goToNextDay = () =>
-    setCurrentDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000));
-  const goToPrevDay = () =>
-    setCurrentDate(new Date(currentDate.getTime() - 24 * 60 * 60 * 1000));
-
-  const handleFilter = async ({
-    date,
-    pacienteId,
-    turnoId,
-    turnoPaciente,
-    turnoPacienteId,
-  }: {
-    date?: string;
-    pacienteId?: string;
-    turnoId?: string;
-    turnoPaciente?: string;
-    turnoPacienteId?: string;
-  }) => {
-    let response;
-
-    if (date) {
-      response = await getByDate(date);
-    } else if (pacienteId) {
-      response = await getByPatient(pacienteId);
-    } else if (turnoId && getByTurno) {
-      response = await getByTurno(turnoId);
-    } else if (turnoPaciente && getByTurnoPaciente) {
-      response = await getByTurnoPaciente(turnoPaciente);
-    } else if (turnoPacienteId && getByTurnoPacienteId) {
-      response = await getByTurnoPacienteId(turnoPacienteId);
-    } else {
-      reload();
-      response = events;
-    }
-
-    setFilteredEvents(response);
-  };
-
-  const handleReset = () => {
-    reload();
-    setFilteredEvents(events);
-  };
+  const { filteredEvents, filterTurnos, resetTurnos, error } = useFiltroTurnos({
+    getByDate,
+    getByPatient,
+    getByTurno,
+    getByTurnoPaciente,
+    getByTurnoPacienteId,
+    reload,
+  });
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <TurnoFiltradoForm onFilter={handleFilter} onReset={handleReset} />
+      <TurnoFiltradoForm onFilter={filterTurnos} onReset={resetTurnos} />
+
+      {error && <Text style={{ color: "red" }}>{error}</Text>}
 
       <View
         style={{
@@ -86,21 +45,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         <Button title="Día" onPress={() => setMode("day")} />
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginVertical: 10,
-        }}
-      >
-        <Button title="Anterior" onPress={goToPrevDay} />
-        <Button title="Hoy" onPress={goToToday} />
-        <Button title="Siguiente" onPress={goToNextDay} />
-      </View>
-
-      {/* Calendario */}
       <Calendar
-        events={filteredEvents}
+        events={filteredEvents.length ? filteredEvents : events}
         height={600}
         mode={mode}
         date={currentDate}

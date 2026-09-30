@@ -11,10 +11,10 @@ import {
 } from "react-native";
 
 interface TurnoFormProps {
-  onSave: (turno: any) => void;
+  onSave: (turno: TurnoDto) => void;
   onRemove?: (id: string) => void;
   onReset?: () => void;
-  selectedTurno?: any;
+  selectedTurno?: TurnoDto;
 }
 
 const TurnoForm: React.FC<TurnoFormProps> = ({
@@ -25,7 +25,9 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
 }) => {
   const [fecha, setFecha] = useState(selectedTurno?.fecha ?? "");
   const [hora, setHora] = useState(selectedTurno?.hora ?? "");
-  const [estado, setEstado] = useState<TurnoDto["estado"]>("pendiente");
+  const [estado, setEstado] = useState<TurnoDto["estado"]>(
+    selectedTurno?.estado ?? "pendiente",
+  );
   const [asistencia, setAsistencia] = useState(
     selectedTurno?.asistencia ?? false,
   );
@@ -37,19 +39,20 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
   const [cantidadTurnos, setCantidadTurnos] = useState(
     selectedTurno?.cantidadTurnos ?? 1,
   );
-  const [psicologoID, setPsicologoID] = useState(
-    selectedTurno?.psicologoID ?? "",
+  const [psicologoId, setPsicologoId] = useState(
+    selectedTurno?.psicologoId ?? "",
   );
-  const [pacienteID, setPacienteID] = useState(selectedTurno?.pacienteID ?? "");
-  const [planTurnoID, setPlanTurnoID] = useState(
-    selectedTurno?.planTurnoID ?? "",
+  const [pacienteId, setPacienteId] = useState(selectedTurno?.pacienteId ?? "");
+  const [planTurnoId, setPlanTurnoId] = useState(
+    selectedTurno?.planTurnoId ?? "",
   );
   const [descripcion, setDescripcion] = useState(
     selectedTurno?.descripcion ?? "",
   );
 
   const handleSubmit = () => {
-    const turno = {
+    const turno: TurnoDto = {
+      turnoId: selectedTurno?.turnoId,
       fecha,
       hora,
       estado,
@@ -58,9 +61,9 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
       modalidadVirtual,
       url: modalidadVirtual ? url : null,
       cantidadTurnos,
-      psicologoID,
-      pacienteID,
-      planTurnoID,
+      psicologoId,
+      pacienteId,
+      planTurnoId,
       descripcion,
     };
     onSave(turno);
@@ -78,7 +81,6 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
         value={fecha}
         onChangeText={setFecha}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Hora (HH:mm)"
@@ -89,7 +91,7 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
       <Text style={styles.label}>Estado</Text>
       <Picker
         selectedValue={estado}
-        onValueChange={(itemValue: TurnoDto["estado"]) => setEstado(itemValue)}
+        onValueChange={(val: TurnoDto["estado"]) => setEstado(val)}
       >
         <Picker.Item label="Pendiente" value="pendiente" />
         <Picker.Item label="Confirmado" value="confirmado" />
@@ -101,9 +103,6 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
         <Switch value={asistencia} onValueChange={setAsistencia} />
       </View>
 
-      <View style={styles.switchRow}>
-        <Text>Duración (en minutos)</Text>
-      </View>
       <TextInput
         style={styles.input}
         placeholder="Duración (minutos)"
@@ -111,6 +110,7 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
         value={String(minutos)}
         onChangeText={(val) => setMinutos(Number(val))}
       />
+
       <View style={styles.switchRow}>
         <Text>Modalidad virtual</Text>
         <Switch value={modalidadVirtual} onValueChange={setModalidadVirtual} />
@@ -134,28 +134,24 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
         value={String(cantidadTurnos)}
         onChangeText={(val) => setCantidadTurnos(Number(val))}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Psicólogo ID"
-        value={psicologoID}
-        onChangeText={setPsicologoID}
+        value={psicologoId}
+        onChangeText={setPsicologoId}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Paciente ID"
-        value={pacienteID}
-        onChangeText={setPacienteID}
+        value={pacienteId}
+        onChangeText={setPacienteId}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Plan Turno ID"
-        value={planTurnoID}
-        onChangeText={setPlanTurnoID}
+        value={planTurnoId}
+        onChangeText={setPlanTurnoId}
       />
-
       <TextInput
         style={[styles.input, { height: 80 }]}
         placeholder="Descripción"
@@ -173,7 +169,7 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
           <Button
             title="Eliminar"
             color="red"
-            onPress={() => onRemove(selectedTurno.turnoID)}
+            onPress={() => onRemove(selectedTurno.turnoId!)}
           />
         )}
         {selectedTurno && onReset && (
