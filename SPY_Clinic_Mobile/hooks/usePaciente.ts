@@ -17,7 +17,7 @@ export function usePaciente({
     data: pacientesData = [],
     isLoading,
     error,
-  } = useQuery<PacienteDto[]>({
+  } = useQuery<PacienteDto[], Error>({
     queryKey: ["pacientes"],
     queryFn: getAll,
   });
@@ -57,10 +57,9 @@ export function usePaciente({
   const removePacienteMutation = useMutation({
     mutationFn: (pacienteId: number) => remove(pacienteId),
     onSuccess: (_, pacienteId) => {
-      queryClient.setQueryData(["pacientes"], (old: PacienteDto[] = []) => {
-        return old.filter((p) => p.Id !== pacienteId);
-      });
-
+      queryClient.setQueryData(["pacientes"], (old: PacienteDto[] = []) =>
+        old.filter((p) => p.Id !== pacienteId),
+      );
       queryClient.invalidateQueries({ queryKey: ["pacienteById", pacienteId] });
     },
   });
@@ -69,7 +68,7 @@ export function usePaciente({
     FilterPacienteById,
     pacientesData,
     isLoading,
-    error,
+    error: error as unknown,
     createPacienteMutation,
     updatePacienteMutation,
     removePacienteMutation,

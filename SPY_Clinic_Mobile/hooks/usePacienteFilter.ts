@@ -1,6 +1,7 @@
 import { PacienteDto } from "@/models/PacienteDto";
 import { useMemo, useState } from "react";
 
+
 export function usePacienteFilter(pacientesData: PacienteDto[]) {
   //logic of serch any paciente by name (nombre:string)
 

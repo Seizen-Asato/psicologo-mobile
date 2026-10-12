@@ -14,8 +14,10 @@ export async function Login(email, password) {
 
 export async function session() {
   const token = await SecureStore.getItemAsync("token");
-  return fetchApi(`${BASE_URL}/session`, {
+  const data = await fetchApi(`${BASE_URL}/session`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
+
+  return data;
 }

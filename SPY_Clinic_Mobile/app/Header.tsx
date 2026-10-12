@@ -5,13 +5,18 @@ import { useAuthStore } from "../context/Auth";
 export default function Header() {
   const user = useAuthStore((state) => state.user);
 
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-    : "??";
+  const displayName = user?.name
+    ? `${user.name}${user.lastName ? " " + user.lastName : ""}`
+    : "Invitado";
+
+  const initials =
+    user?.name && user.name.trim() !== ""
+      ? user.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+      : "??";
 
   return (
     <View style={styles.header}>
@@ -22,7 +27,7 @@ export default function Header() {
           <Text style={styles.avatarText}>{initials}</Text>
         </View>
         <View style={styles.info}>
-          <Text style={styles.name}>{user?.name ?? "Invitado"}</Text>
+          <Text style={styles.name}>{displayName}</Text>
           <Text style={styles.role}>{user ? "Psicólogo" : "Sin rol"}</Text>
         </View>
         {user && <LogoutButton />}
@@ -54,5 +59,4 @@ const styles = StyleSheet.create({
   info: { marginRight: 12 },
   name: { color: "#fff", fontSize: 14 },
   role: { color: "#ccc", fontSize: 12 },
-  logout: { color: "red", fontWeight: "bold" },
 });

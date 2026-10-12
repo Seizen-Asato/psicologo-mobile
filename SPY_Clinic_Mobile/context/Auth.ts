@@ -1,9 +1,16 @@
 import { create } from "zustand";
 
+type User = {
+  id: string;
+  email: string;
+  name?: string;
+  lastName?: string;
+};
+
 type AuthState = {
-  user: null | { id: string; email: string; name?: string; lastName?: string };
+  user: User | null;
   token: string | null;
-  login: (user: { id: string; email: string }, token: string) => void;
+  login: (user: User, token: string) => void;
   logout: () => void;
 };
 
