@@ -34,6 +34,14 @@ function Nav() {
         </View>
 
         <View style={styles.sideNavItem}>
+          <Link href="/ListaTurnos" asChild>
+            <Pressable>
+              <Text style={styles.sideNavLink}>Lista Turnos</Text>
+            </Pressable>
+          </Link>
+        </View>
+
+        <View style={styles.sideNavItem}>
           <Link href="/login" asChild>
             <Pressable>
               <Text style={styles.sideNavLink}>Login</Text>

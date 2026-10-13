@@ -1,3 +1,6 @@
+import { PacienteDto } from "./PacienteDto";
+import { PsicologoDto } from "./PsicolgoDto";
+
 export interface TurnoDto {
   turnoId?: string;
   fecha: string;
@@ -12,4 +15,7 @@ export interface TurnoDto {
   pacienteId: string;
   planTurnoId: string;
   descripcion: string;
+
+  paciente?: PacienteDto;
+  psicologo?: PsicologoDto;
 }

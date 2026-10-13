@@ -1,6 +1,7 @@
+import { useTurno } from "@/hooks/useTurno";
 import { TurnoDto } from "@/models/TurnoDto";
 import { Picker } from "@react-native-picker/picker";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Button,
   StyleSheet,
@@ -11,62 +12,39 @@ import {
 } from "react-native";
 
 interface TurnoFormProps {
-  onSave: (turno: TurnoDto) => void;
-  onRemove?: (id: string) => void;
+  selectedTurno?: TurnoDto | null;
   onReset?: () => void;
-  selectedTurno?: TurnoDto;
+  onSave: (turno: TurnoDto) => void;
 }
 
-const TurnoForm: React.FC<TurnoFormProps> = ({
-  onSave,
-  onRemove,
-  onReset,
+export default function TurnoForm({
   selectedTurno,
-}) => {
-  const [fecha, setFecha] = useState(selectedTurno?.fecha ?? "");
-  const [hora, setHora] = useState(selectedTurno?.hora ?? "");
-  const [estado, setEstado] = useState<TurnoDto["estado"]>(
-    selectedTurno?.estado ?? "pendiente",
-  );
-  const [asistencia, setAsistencia] = useState(
-    selectedTurno?.asistencia ?? false,
-  );
-  const [minutos, setMinutos] = useState(selectedTurno?.minutos ?? 60);
-  const [modalidadVirtual, setModalidadVirtual] = useState(
-    selectedTurno?.modalidadVirtual ?? false,
-  );
-  const [url, setUrl] = useState(selectedTurno?.url ?? "");
-  const [cantidadTurnos, setCantidadTurnos] = useState(
-    selectedTurno?.cantidadTurnos ?? 1,
-  );
-  const [psicologoId, setPsicologoId] = useState(
-    selectedTurno?.psicologoId ?? "",
-  );
-  const [pacienteId, setPacienteId] = useState(selectedTurno?.pacienteId ?? "");
-  const [planTurnoId, setPlanTurnoId] = useState(
-    selectedTurno?.planTurnoId ?? "",
-  );
-  const [descripcion, setDescripcion] = useState(
-    selectedTurno?.descripcion ?? "",
-  );
+  onReset,
+  onSave,
+}: TurnoFormProps) {
+  const { saveTurno } = useTurno();
+  const [turno, setTurno] = useState<TurnoDto>({
+    fecha: "",
+    hora: "",
+    estado: "pendiente",
+    asistencia: false,
+    minutos: 30,
+    modalidadVirtual: false,
+    cantidadTurnos: 1,
+    psicologoId: "",
+    pacienteId: "",
+    planTurnoId: "",
+    descripcion: "",
+  });
 
-  const handleSubmit = () => {
-    const turno: TurnoDto = {
-      turnoId: selectedTurno?.turnoId,
-      fecha,
-      hora,
-      estado,
-      asistencia,
-      minutos,
-      modalidadVirtual,
-      url: modalidadVirtual ? url : null,
-      cantidadTurnos,
-      psicologoId,
-      pacienteId,
-      planTurnoId,
-      descripcion,
-    };
-    onSave(turno);
+  const handleSubmit = async () => {
+    try {
+      await saveTurno(turno);
+      onSave(turno);
+      onReset?.();
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -78,20 +56,22 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
       <TextInput
         style={styles.input}
         placeholder="Fecha (YYYY-MM-DD)"
-        value={fecha}
-        onChangeText={setFecha}
+        value={turno.fecha}
+        onChangeText={(text) => setTurno({ ...turno, fecha: text })}
       />
       <TextInput
         style={styles.input}
         placeholder="Hora (HH:mm)"
-        value={hora}
-        onChangeText={setHora}
+        value={turno.hora}
+        onChangeText={(text) => setTurno({ ...turno, hora: text })}
       />
 
       <Text style={styles.label}>Estado</Text>
       <Picker
-        selectedValue={estado}
-        onValueChange={(val: TurnoDto["estado"]) => setEstado(val)}
+        selectedValue={turno.estado}
+        onValueChange={(val: TurnoDto["estado"]) =>
+          setTurno({ ...turno, estado: val })
+        }
       >
         <Picker.Item label="Pendiente" value="pendiente" />
         <Picker.Item label="Confirmado" value="confirmado" />
@@ -100,28 +80,36 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
 
       <View style={styles.switchRow}>
         <Text>Asistencia</Text>
-        <Switch value={asistencia} onValueChange={setAsistencia} />
+        <Switch
+          value={turno.asistencia}
+          onValueChange={(val) => setTurno({ ...turno, asistencia: val })}
+        />
       </View>
 
       <TextInput
         style={styles.input}
         placeholder="Duración (minutos)"
         keyboardType="numeric"
-        value={String(minutos)}
-        onChangeText={(val) => setMinutos(Number(val))}
+        value={String(turno.minutos)}
+        onChangeText={(val) =>
+          setTurno({ ...turno, minutos: Number(val) || 0 })
+        }
       />
 
       <View style={styles.switchRow}>
         <Text>Modalidad virtual</Text>
-        <Switch value={modalidadVirtual} onValueChange={setModalidadVirtual} />
+        <Switch
+          value={turno.modalidadVirtual}
+          onValueChange={(val) => setTurno({ ...turno, modalidadVirtual: val })}
+        />
       </View>
 
-      {modalidadVirtual ? (
+      {turno.modalidadVirtual ? (
         <TextInput
           style={styles.input}
           placeholder="URL de sesión"
-          value={url}
-          onChangeText={setUrl}
+          value={turno.url ?? ""}
+          onChangeText={(text) => setTurno({ ...turno, url: text })}
         />
       ) : (
         <Text style={styles.label}>Modalidad presencial</Text>
@@ -131,33 +119,35 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
         style={styles.input}
         placeholder="Cantidad de turnos"
         keyboardType="numeric"
-        value={String(cantidadTurnos)}
-        onChangeText={(val) => setCantidadTurnos(Number(val))}
+        value={String(turno.cantidadTurnos)}
+        onChangeText={(val) =>
+          setTurno({ ...turno, cantidadTurnos: Number(val) || 1 })
+        }
       />
       <TextInput
         style={styles.input}
         placeholder="Psicólogo ID"
-        value={psicologoId}
-        onChangeText={setPsicologoId}
+        value={turno.psicologoId}
+        onChangeText={(text) => setTurno({ ...turno, psicologoId: text })}
       />
       <TextInput
         style={styles.input}
         placeholder="Paciente ID"
-        value={pacienteId}
-        onChangeText={setPacienteId}
+        value={turno.pacienteId}
+        onChangeText={(text) => setTurno({ ...turno, pacienteId: text })}
       />
       <TextInput
         style={styles.input}
         placeholder="Plan Turno ID"
-        value={planTurnoId}
-        onChangeText={setPlanTurnoId}
+        value={turno.planTurnoId}
+        onChangeText={(text) => setTurno({ ...turno, planTurnoId: text })}
       />
       <TextInput
         style={[styles.input, { height: 80 }]}
         placeholder="Descripción"
         multiline
-        value={descripcion}
-        onChangeText={setDescripcion}
+        value={turno.descripcion}
+        onChangeText={(text) => setTurno({ ...turno, descripcion: text })}
       />
 
       <View style={styles.actions}>
@@ -165,43 +155,47 @@ const TurnoForm: React.FC<TurnoFormProps> = ({
           title={selectedTurno ? "Guardar cambios" : "Crear turno"}
           onPress={handleSubmit}
         />
-        {selectedTurno && onRemove && (
-          <Button
-            title="Eliminar"
-            color="red"
-            onPress={() => onRemove(selectedTurno.turnoId!)}
-          />
-        )}
         {selectedTurno && onReset && (
           <Button title="Nuevo" color="gray" onPress={onReset} />
         )}
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
-  heading: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  label: { marginTop: 10, fontWeight: "bold" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 8,
-    marginBottom: 10,
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 8,
   },
   switchRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
   actions: {
-    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-around",
+    marginTop: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 8,
+    marginBottom: 12,
+    borderRadius: 4,
   },
 });
-
-export default TurnoForm;

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "skills": {
+    "building-native-ui": {
+      "source": "expo/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "5bfac6ea4750cb2bf6d2b703ebb8d524d447c80f9e7bf9b5a55f6f7544e6c246"
+    },
+    "composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "c124390cc3441844903ada94cb5820b23d922f2d0ad34e01e029e410197c8a32"
+    },
+    "expo-api-routes": {
+      "source": "expo/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "8b4ce4d0ab40f0633dfc202c2b91bcf4c6d318393634a37960c37b1c2f9d7893"
+    },
+    "native-data-fetching": {
+      "source": "expo/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "ce74c0616f566814d0c9a82585817719f39f82853bf1a50c9e590e0c7c7051f4"
+    },
+    "react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "502eb06700e2c3cb1bd7f710860528f72281320bd5171a2087b05a090b573dc1"
+    },
+    "typescript-advanced-types": {
+      "source": "wshobson/agents",
+      "sourceType": "autoskills-registry",
+      "computedHash": "5ca0e177c6aaaba1889255691224daafdb7d71f317cc70bede1590d3907ded42"
+    },
+    "use-dom": {
+      "source": "expo/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "77b56e964db680ac3efc8e11bba139d199285b08ecc5d94a6c433069537251d3"
+    }
+  }
+}

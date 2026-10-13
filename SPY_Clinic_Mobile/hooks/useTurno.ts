@@ -8,6 +8,19 @@ export function useTurno() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchTurnosALL = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await turnosService.getAll();
+      setTurnos(data || []);
+    } catch (err: any) {
+      setError("Error al cargar turnos de la semana");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchTurnosSemana = async (date: Date = new Date()) => {
     setLoading(true);
     setError(null);
@@ -73,6 +86,7 @@ export function useTurno() {
     turnos,
     loading,
     error,
+    fetchTurnosALL,
     fetchTurnosSemana,
     saveTurno,
     removeTurno,

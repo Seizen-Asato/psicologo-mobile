@@ -1,8 +1,12 @@
 import { fetchApi } from "./apiClient";
 import { BASE_URL } from "./baseUrl";
 
+export async function getAll() {
+  return fetchApi(`${BASE_URL}/turno/todos`);
+}
+
 export async function getByRange(desde, hasta) {
-  return fetchApi(`${BASE_URL}/turno?desde=${desde}&hasta=${hasta}`);
+  return fetchApi(`${BASE_URL}/turno?range=${desde}&hasta=${hasta}`);
 }
 
 export async function getById(id) {
