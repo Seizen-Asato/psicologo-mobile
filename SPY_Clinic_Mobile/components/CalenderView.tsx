@@ -50,7 +50,9 @@ const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
         height={600}
         mode={mode}
         date={currentDate}
-        onPressEvent={(event) => console.log("Evento seleccionado:", event)}
+        onPressEvent={(event: EventoDto) =>
+          console.log("Evento seleccionado:", event)
+        }
       />
     </View>
   );

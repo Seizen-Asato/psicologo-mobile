@@ -1,8 +1,10 @@
-import { ScrollView } from "react-native";
 import PacienteScren from "@/screen/PacienteScreen";
+import { ScrollView } from "react-native";
 
-export default function paciente() {
-  <ScrollView>
-    <PacienteScren />
-  </ScrollView>;
+export default function Paciente() {
+  return (
+    <ScrollView>
+      <PacienteScren />
+    </ScrollView>
+  );
 }

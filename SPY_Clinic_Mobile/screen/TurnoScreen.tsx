@@ -47,7 +47,7 @@ export default function TurnoScreen({ selectedTurno }: TurnoScreenProps) {
       onSave={handleSave}
       onRemove={handleRemove}
       onReset={handleReset}
-      selectedTurno={selectedTurno}
+      selectedTurno={selectedTurno ?? undefined}
     />
   );
 }

@@ -1,6 +1,14 @@
 import { PacienteDto } from "@/models/PacienteDto";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Button,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 type PacienteFormProps = {
   onSave: (paciente: PacienteDto) => void;
@@ -13,6 +21,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
   const [fechaNacimiento, setFechaNacimiento] = useState(
     selected?.fechaNacimiento ?? new Date(),
   );
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
   const [Mail, setMail] = useState(selected?.Mail ?? "");
   const [Dni, setDni] = useState(selected?.Dni ?? "");
   const [Telefono, setTelefono] = useState(selected?.Telefono ?? "");
@@ -27,6 +36,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       Telefono,
       fechaNacimiento,
     };
+
     onSave(paciente);
   };
 
@@ -78,28 +88,72 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       />
 
       <Text style={styles.label}>Fecha de nacimiento</Text>
-      <TextInput
-        style={styles.input}
-        value={fechaNacimiento.toISOString().split("T")[0]}
-        onChangeText={(text) => setFechaNacimiento(new Date(text))}
-        placeholder="YYYY-MM-DD"
-      />
 
-      <Button title="Guardar" onPress={handleSubmit} />
+      <Pressable
+        style={styles.dateInput}
+        onPress={() => setMostrarCalendario(true)}
+      >
+        <Text style={styles.dateText}>
+          {fechaNacimiento.toLocaleDateString("es-AR")}
+        </Text>
+      </Pressable>
+
+      {mostrarCalendario && (
+        <DateTimePicker
+          value={fechaNacimiento}
+          mode="date"
+          display="calendar"
+          maximumDate={new Date()}
+          onValueChange={(_event, date) => {
+            setFechaNacimiento(date);
+            setMostrarCalendario(false);
+          }}
+          onDismiss={() => setMostrarCalendario(false)}
+        />
+      )}
+
+      <View style={styles.saveButton}>
+        <Button title="Guardar" onPress={handleSubmit} />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
-  title: { fontSize: 18, fontWeight: "bold", marginBottom: 12 },
-  label: { marginBottom: 4, fontWeight: "600" },
+  container: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  label: {
+    marginBottom: 4,
+    fontWeight: "600",
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 4,
     padding: 8,
     marginBottom: 12,
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    padding: 12,
+    minHeight: 44,
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  dateText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  saveButton: {
+    marginTop: 8,
   },
 });
 

@@ -29,6 +29,7 @@ export default function PacienteScren() {
 
   const { pacienteNameFilter, filter, filterPaciente } =
     usePacienteFilter(pacientesData);
+  console.log("Pacientes recibidos:", pacientesData);
   if (isLoading) {
     return <ActivityIndicator size="large" color="#007AFF" />;
   }

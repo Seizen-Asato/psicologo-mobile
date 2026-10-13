@@ -45,7 +45,7 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
   return (
     <View style={styles.container}>
       {isLoading && <ActivityIndicator size="small" color="#007AFF" />}
-      {error && (
+      {error != null && (
         <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>
       )}
 
