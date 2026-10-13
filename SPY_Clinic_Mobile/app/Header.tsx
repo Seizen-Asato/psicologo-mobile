@@ -28,7 +28,7 @@ export default function Header() {
         </View>
         <View style={styles.info}>
           <Text style={styles.name}>{displayName}</Text>
-          <Text style={styles.role}>{user ? "Psicólogo" : "Sin rol"}</Text>
+          <Text style={styles.role}>{user?.role ?? "Sin rol"}</Text>
         </View>
         {user && <LogoutButton />}
       </View>

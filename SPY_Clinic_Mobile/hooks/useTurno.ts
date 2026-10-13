@@ -5,6 +5,8 @@ import { useState } from "react";
 
 export function useTurno() {
   const [turnos, setTurnos] = useState<TurnoDto[]>([]);
+  const [apellido, setApellido] = useState<string>("");
+  const [estado, setEstado] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,6 +52,29 @@ export function useTurno() {
     if (!turno.pacienteId) throw new Error("Debe seleccionar un paciente");
   };
 
+  const filterByApellido = (apellido: string, t: TurnoDto) => {
+    const A = apellido.toUpperCase();
+    const apellidoTurno = t.paciente?.Apellido?.toUpperCase() || "";
+    return apellidoTurno.startsWith(A);
+  };
+
+  const filterByEstado = (estado: string, t: TurnoDto) => {
+    return t.estado === estado;
+  };
+
+  const filterTurnos = () => {
+    let filtrados = turnos;
+
+    if (apellido) {
+      filtrados = filtrados.filter((t) => filterByApellido(apellido, t));
+    }
+
+    if (estado) {
+      filtrados = filtrados.filter((t) => filterByEstado(estado, t));
+    }
+
+    return filtrados;
+  };
   const saveTurno = async (turno: TurnoDto) => {
     setLoading(true);
     setError(null);
@@ -86,9 +111,16 @@ export function useTurno() {
     turnos,
     loading,
     error,
+    apellido,
+    estado,
     fetchTurnosALL,
     fetchTurnosSemana,
+    filterByApellido,
+    filterByEstado,
+    filterTurnos,
     saveTurno,
     removeTurno,
+    setEstado,
+    setApellido,
   };
 }

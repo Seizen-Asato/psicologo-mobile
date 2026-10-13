@@ -4,4 +4,5 @@ export interface PsicologoDto {
   apellido: string;
   telefono?: string | null;
   email?: string | null;
+  role?: string;
 }
