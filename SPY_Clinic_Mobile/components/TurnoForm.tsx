@@ -6,13 +6,20 @@ import * as psicologosService from "@/services/PsicologoService";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import {
-  Button,
   StyleSheet,
   Switch,
   Text,
   TextInput,
   View,
 } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import {
+  PrimaryButton,
+  PrimaryButtonLabel,
+  SecondaryButton,
+  SecondaryButtonLabel,
+} from "../style/ui/Buttons";
 
 interface TurnoFormProps {
   selectedTurno?: TurnoDto | null;
@@ -26,6 +33,8 @@ export default function TurnoForm({
   onSave,
 }: TurnoFormProps) {
   const { saveTurno } = useTurno();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
   const [psicologos, setPsicologos] = useState<any[]>([]);
   const [pacientes, setPacientes] = useState<any[]>([]);
@@ -103,7 +112,7 @@ export default function TurnoForm({
       </Picker>
 
       <View style={styles.switchRow}>
-        <Text>Asistencia</Text>
+        <Text style={styles.rowLabel}>Asistencia</Text>
         <Switch
           value={turno.asistencia}
           onValueChange={(val) => setTurno({ ...turno, asistencia: val })}
@@ -121,7 +130,7 @@ export default function TurnoForm({
       />
 
       <View style={styles.switchRow}>
-        <Text>Modalidad virtual</Text>
+        <Text style={styles.rowLabel}>Modalidad virtual</Text>
         <Switch
           value={turno.modalidadVirtual}
           onValueChange={(val) => setTurno({ ...turno, modalidadVirtual: val })}
@@ -183,7 +192,7 @@ export default function TurnoForm({
         ))}
       </Picker>
 
-      {/* 🔹 Picker de planes */}
+      {/* Picker de planes */}
       <Text style={styles.label}>Plan de Turno</Text>
       <Picker
         selectedValue={turno.planTurnoId}
@@ -210,43 +219,75 @@ export default function TurnoForm({
       />
 
       <View style={styles.actions}>
-        <Button
-          title={selectedTurno ? "Guardar cambios" : "Crear turno"}
+        <PrimaryButton
+          style={styles.action}
           onPress={handleSubmit}
-        />
+          accessibilityRole="button"
+          accessibilityLabel={
+            selectedTurno ? "Guardar cambios" : "Crear turno"
+          }
+        >
+          <PrimaryButtonLabel>
+            {selectedTurno ? "Guardar cambios" : "Crear turno"}
+          </PrimaryButtonLabel>
+        </PrimaryButton>
         {selectedTurno && onReset && (
-          <Button title="Nuevo" color="gray" onPress={onReset} />
+          <SecondaryButton
+            style={styles.action}
+            onPress={onReset}
+            accessibilityRole="button"
+            accessibilityLabel="Nuevo turno"
+          >
+            <SecondaryButtonLabel>Nuevo</SecondaryButtonLabel>
+          </SecondaryButton>
         )}
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
-  heading: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  label: { fontSize: 14, fontWeight: "600", marginBottom: 8 },
-  switchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 8,
-    marginBottom: 12,
-    borderRadius: 4,
-  },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 16,
+      backgroundColor: theme.colors.background,
+    },
+    heading: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginBottom: 16,
+      textAlign: "center",
+      color: theme.colors.textPrimary,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: "600",
+      marginBottom: 8,
+      color: theme.colors.textSecondary,
+    },
+    rowLabel: { color: theme.colors.textPrimary },
+    switchRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 12,
+    },
+    actions: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginTop: 20,
+      gap: 8,
+    },
+    action: { flex: 1 },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+      minHeight: 44,
+      padding: 12,
+      marginBottom: 12,
+      borderRadius: 6,
+    },
+  });

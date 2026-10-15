@@ -6,7 +6,13 @@ import { usePacienteFilter } from "@/hooks/usePacienteFilter";
 import { PacienteDto } from "@/models/PacienteDto";
 import * as PacienteService from "@/services/PacienteService";
 import { useState } from "react";
-import { ActivityIndicator, Button, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import {
+  SecondaryButton,
+  SecondaryButtonLabel,
+} from "../style/ui/Buttons";
 
 export default function PacienteScren() {
   const {
@@ -23,6 +29,8 @@ export default function PacienteScren() {
     update: PacienteService.update,
     remove: PacienteService.remove,
   });
+  const theme = useTheme();
+  const styles = makeStyles(theme);
   const [selectedPaciente, setSelectedPaciente] = useState<
     PacienteDto | undefined
   >(undefined);
@@ -30,13 +38,21 @@ export default function PacienteScren() {
   const { pacienteNameFilter, filter, filterPaciente } =
     usePacienteFilter(pacientesData);
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#007AFF" />;
+    return (
+      <View style={styles.feedback}>
+        <ActivityIndicator size="large" color={theme.colors.actionPrimary} />
+      </View>
+    );
   }
   if (error) {
-    return <Text style={{ color: "red" }}>Error al cargar pacientes</Text>;
+    return (
+      <View style={styles.feedback}>
+        <Text style={styles.error}>Error al cargar pacientes</Text>
+      </View>
+    );
   }
   return (
-    <>
+    <View style={styles.container}>
       <PacienteForm
         onSave={
           selectedPaciente
@@ -49,10 +65,13 @@ export default function PacienteScren() {
       <PacienteFilter filter={filter} onFilterChange={pacienteNameFilter} />
       {filterPaciente.map((p) => (
         <View key={p.Id} style={{ marginVertical: 8 }}>
-          <Button
-            title={`Editar ${p.Nombre}`}
+          <SecondaryButton
             onPress={() => setSelectedPaciente(p)}
-          />
+            accessibilityRole="button"
+            accessibilityLabel={`Editar ${p.Nombre}`}
+          >
+            <SecondaryButtonLabel>Editar {p.Nombre}</SecondaryButtonLabel>
+          </SecondaryButton>
           <PacienteRemove
             pacienteId={p.Id!}
             pacienteNombre={p.Nombre}
@@ -62,6 +81,18 @@ export default function PacienteScren() {
           />
         </View>
       ))}
-    </>
+    </View>
   );
 }
+
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.background },
+    feedback: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+    },
+    error: { color: theme.colors.error, fontSize: 16 },
+  });

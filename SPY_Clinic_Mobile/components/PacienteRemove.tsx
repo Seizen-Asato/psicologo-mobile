@@ -1,12 +1,8 @@
 import React from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Button,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import { DangerButton, SecondaryButtonLabel } from "../style/ui/Buttons";
 
 const getErrorMessage = (err: unknown) =>
   err instanceof Error ? err.message : String(err);
@@ -26,6 +22,9 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
   isLoading,
   error,
 }) => {
+  const theme = useTheme();
+  const styles = makeStyles(theme);
+
   const handleRemove = () => {
     Alert.alert(
       "Confirmar eliminación",
@@ -43,19 +42,28 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
 
   return (
     <View style={styles.container}>
-      {isLoading && <ActivityIndicator size="small" color="#007AFF" />}
-      {error && (
-        <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>
+      {isLoading && (
+        <ActivityIndicator size="small" color={theme.colors.actionPrimary} />
       )}
+      {error ? (
+        <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>
+      ) : null}
 
-      <Button title="Eliminar paciente" color="red" onPress={handleRemove} />
+      <DangerButton
+        onPress={handleRemove}
+        accessibilityRole="button"
+        accessibilityLabel="Eliminar paciente"
+      >
+        <SecondaryButtonLabel>Eliminar paciente</SecondaryButtonLabel>
+      </DangerButton>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: { marginVertical: 8 },
-  error: { color: "red", marginTop: 4 },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: { marginVertical: 8 },
+    error: { color: theme.colors.error, marginTop: 4 },
+  });
 
 export default PacienteRemove;

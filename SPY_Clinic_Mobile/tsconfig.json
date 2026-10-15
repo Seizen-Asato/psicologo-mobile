@@ -5,8 +5,7 @@
     "jsx": "react-native",
     "paths": {
       "@/*": ["./*"]
-    },
-    "types": ["styled-components-react-native"]
+    }
   },
   "include": [
     "src",

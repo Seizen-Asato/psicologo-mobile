@@ -5,7 +5,8 @@ type User = {
   email: string;
   name?: string;
   lastName?: string;
-  role: string;
+  // El backend puede no devolver rol en /login; Header usa "Sin rol".
+  role?: string;
 };
 
 type AuthState = {
