@@ -1,7 +1,10 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
-import { Button, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
 import { AgendaDto } from "../models/AgendaDto";
+import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
 import * as pacientesService from "../services/PacienteService";
 import * as psicologosService from "../services/PsicologoService";
 
@@ -12,6 +15,8 @@ interface AgendaFormProps {
 const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
   const [psicologos, setPsicologos] = useState<any[]>([]);
   const [pacientes, setPacientes] = useState<any[]>([]);
+  const theme = useTheme();
+  const styles = makeStyles(theme);
   const [agenda, setAgenda] = useState<AgendaDto>({
     agendaId: 0,
     psicologoId: 0,
@@ -67,40 +72,40 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
   };
 
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View style={styles.container}>
       <TextInput
         placeholder="Título"
         value={agenda.titulo}
         onChangeText={(text) => setAgenda({ ...agenda, titulo: text })}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        style={styles.input}
       />
 
       <TextInput
         placeholder="Fecha (YYYY-MM-DD)"
         value={agenda.fecha}
         onChangeText={(text) => setAgenda({ ...agenda, fecha: text })}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        style={styles.input}
       />
 
       <TextInput
         placeholder="Hora inicio (HH:mm)"
         value={agenda.horaInicio}
         onChangeText={(text) => setAgenda({ ...agenda, horaInicio: text })}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        style={styles.input}
       />
 
       <TextInput
         placeholder="Hora fin (HH:mm)"
         value={agenda.horaFin}
         onChangeText={(text) => setAgenda({ ...agenda, horaFin: text })}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        style={styles.input}
       />
 
       <TextInput
         placeholder="Descripción"
         value={agenda.descripcion}
         onChangeText={(text) => setAgenda({ ...agenda, descripcion: text })}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        style={styles.input}
       />
 
       <Picker
@@ -119,7 +124,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
         ))}
       </Picker>
 
-      {/* 🔹 Picker de pacientes */}
+      {/* Picker de pacientes */}
       <Picker
         selectedValue={agenda.pacienteId}
         onValueChange={(value) => setAgenda({ ...agenda, pacienteId: value })}
@@ -134,9 +139,30 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
         ))}
       </Picker>
 
-      <Button title="Crear Agenda" onPress={handleSubmit} />
+      <PrimaryButton
+        onPress={handleSubmit}
+        accessibilityRole="button"
+        accessibilityLabel="Crear agenda"
+      >
+        <PrimaryButtonLabel>Crear Agenda</PrimaryButtonLabel>
+      </PrimaryButton>
     </View>
   );
 };
+
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: { marginBottom: 20 },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+      borderRadius: 6,
+      minHeight: 44,
+      marginBottom: 10,
+      padding: 12,
+    },
+  });
 
 export default AgendaForm;

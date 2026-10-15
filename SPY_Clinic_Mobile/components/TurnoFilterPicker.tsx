@@ -1,6 +1,9 @@
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
-import { Button, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import { SecondaryButton, SecondaryButtonLabel } from "../style/ui/Buttons";
 
 type Props = {
   apellido: string;
@@ -18,6 +21,8 @@ export default function TurnoFilterPicker({
   const letras = Array.from({ length: 26 }, (_, i) =>
     String.fromCharCode(65 + i),
   );
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
   return (
     <View style={styles.container}>
@@ -43,26 +48,32 @@ export default function TurnoFilterPicker({
         <Picker.Item label="Pendiente" value="pendiente" />
       </Picker>
 
-      <Button
-        title="Limpiar filtros"
+      <SecondaryButton
         onPress={() => {
           setApellido("");
           setEstado("");
         }}
-      />
+        accessibilityRole="button"
+        accessibilityLabel="Limpiar filtros"
+      >
+        <SecondaryButtonLabel>Limpiar filtros</SecondaryButtonLabel>
+      </SecondaryButton>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 12,
-    padding: 8,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    elevation: 2,
-  },
-  picker: {
-    marginBottom: 8,
-  },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      marginVertical: 12,
+      padding: 8,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      elevation: 2,
+    },
+    picker: {
+      marginBottom: 8,
+    },
+  });

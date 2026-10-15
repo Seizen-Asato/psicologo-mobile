@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Button, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import {
+  PrimaryButton,
+  PrimaryButtonLabel,
+  SecondaryButton,
+  SecondaryButtonLabel,
+} from "../style/ui/Buttons";
 
 interface TurnoFiltradoFormProps {
   onFilter: (filters: {
@@ -17,6 +25,8 @@ const TurnoFiltradoForm: React.FC<TurnoFiltradoFormProps> = ({
   const [dateFilter, setDateFilter] = useState("");
   const [patientLastNameFilter, setPatientLastNameFilter] = useState("");
   const [patientNameFilter, setPatientNameFilter] = useState("");
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
   const handleSubmit = () => {
     onFilter({
@@ -34,32 +44,68 @@ const TurnoFiltradoForm: React.FC<TurnoFiltradoFormProps> = ({
   };
 
   return (
-    <View style={{ marginBottom: 20, padding: 10 }}>
+    <View style={styles.container}>
       <TextInput
         placeholder="Paciente (apellido)"
         value={patientLastNameFilter}
         onChangeText={setPatientLastNameFilter}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        style={styles.input}
       />
 
       <TextInput
         placeholder="Paciente (nombre)"
         value={patientNameFilter}
         onChangeText={setPatientNameFilter}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        style={styles.input}
       />
 
       <TextInput
         placeholder="Fecha (YYYY-MM-DD)"
         value={dateFilter}
         onChangeText={setDateFilter}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        style={styles.input}
       />
 
-      <Button title="Buscar" onPress={handleSubmit} />
-      <Button title="Ver todos" color="gray" onPress={handleReset} />
+      <PrimaryButton
+        onPress={handleSubmit}
+        accessibilityRole="button"
+        accessibilityLabel="Buscar turnos"
+      >
+        <PrimaryButtonLabel>Buscar</PrimaryButtonLabel>
+      </PrimaryButton>
+      <View style={styles.spacer} />
+      <SecondaryButton
+        onPress={handleReset}
+        accessibilityRole="button"
+        accessibilityLabel="Ver todos los turnos"
+      >
+        <SecondaryButtonLabel>Ver todos</SecondaryButtonLabel>
+      </SecondaryButton>
     </View>
   );
 };
+
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      marginBottom: 20,
+      padding: 12,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.background,
+      color: theme.colors.textPrimary,
+      borderRadius: 6,
+      minHeight: 44,
+      marginBottom: 10,
+      padding: 12,
+    },
+    spacer: { height: 8 },
+  });
 
 export default TurnoFiltradoForm;

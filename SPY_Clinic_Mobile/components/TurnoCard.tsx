@@ -1,5 +1,12 @@
 import { TurnoDto } from "@/models/TurnoDto";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import {
+  DangerButton,
+  SecondaryButton,
+  SecondaryButtonLabel,
+} from "../style/ui/Buttons";
 
 interface TurnoCardProps {
   turno: TurnoDto;
@@ -8,6 +15,9 @@ interface TurnoCardProps {
 }
 
 export function TurnoCard({ turno, onEdit, onRemove }: TurnoCardProps) {
+  const theme = useTheme();
+  const styles = makeStyles(theme);
+
   return (
     <View style={styles.card}>
       <Text style={styles.title}>
@@ -25,44 +35,61 @@ export function TurnoCard({ turno, onEdit, onRemove }: TurnoCardProps) {
       )}
 
       <View style={styles.actions}>
-        <Button title="Editar" onPress={() => onEdit(turno)} />
-        <Button
-          title="Eliminar"
-          color="red"
+        <SecondaryButton
+          style={styles.action}
+          onPress={() => onEdit(turno)}
+          accessibilityRole="button"
+          accessibilityLabel="Editar turno"
+        >
+          <SecondaryButtonLabel>Editar</SecondaryButtonLabel>
+        </SecondaryButton>
+        <DangerButton
+          style={styles.action}
           onPress={() => onRemove(turno.turnoId!)}
-        />
+          accessibilityRole="button"
+          accessibilityLabel="Eliminar turno"
+        >
+          <SecondaryButtonLabel>Eliminar</SecondaryButtonLabel>
+        </DangerButton>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  detail: {
-    fontSize: 12,
-    color: "#555",
-  },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 8,
-  },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+      padding: 12,
+      marginVertical: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      shadowColor: "#000",
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: "bold",
+      marginBottom: 4,
+      color: theme.colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 14,
+      marginBottom: 2,
+      color: theme.colors.textPrimary,
+    },
+    detail: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+    },
+    actions: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: 8,
+      gap: 8,
+    },
+    action: { flex: 1 },
+  });

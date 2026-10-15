@@ -7,13 +7,20 @@ import React, { useEffect, useState } from "react";
 
 import {
   ActivityIndicator,
-  Button,
   FlatList,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import {
+  DangerButton,
+  PrimaryButton,
+  PrimaryButtonLabel,
+  SecondaryButtonLabel,
+} from "../style/ui/Buttons";
 export interface PlanTurnoDto {
   planTurnoId?: number;
   fecha: string;
@@ -23,6 +30,8 @@ export interface PlanTurnoDto {
 }
 export default function PlanTurnoScreen() {
   const { planes, loading, error, createPlan, deletePlan } = usePlanTurno();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
   const [pacientes, setPacientes] = useState<PacienteDto[]>([]);
   const [form, setForm] = useState<{
     paciente: PacienteDto | null;
@@ -81,27 +90,29 @@ export default function PlanTurnoScreen() {
           </Text>
         </View>
         <View style={styles.cardBody}>
-          <Text>
+          <Text style={styles.bodyText}>
             <Text style={styles.bold}>Paciente ID:</Text>{" "}
             {item.pacienteId || "N/A"}
           </Text>
-          <Text>
+          <Text style={styles.bodyText}>
             <Text style={styles.bold}>Fecha:</Text>{" "}
             {item.fecha
               ? new Date(item.fecha).toLocaleString()
               : "No especificada"}
           </Text>
           {item.observaciones && (
-            <Text>
+            <Text style={styles.bodyText}>
               <Text style={styles.bold}>Obs:</Text> {item.observaciones}
             </Text>
           )}
         </View>
-        <Button
-          title="Eliminar"
-          color="red"
+        <DangerButton
           onPress={() => deletePlan(turnoId)}
-        />
+          accessibilityRole="button"
+          accessibilityLabel="Eliminar turno"
+        >
+          <SecondaryButtonLabel>Eliminar</SecondaryButtonLabel>
+        </DangerButton>
       </View>
     );
   };
@@ -119,8 +130,16 @@ export default function PlanTurnoScreen() {
         Crea nuevos turnos y visualiza el listado en tiempo real.
       </Text>
 
-      {formError && <Text style={styles.error}>{formError}</Text>}
-      {successMsg && <Text style={styles.success}>{successMsg}</Text>}
+      {formError && (
+        <View style={styles.errorBox}>
+          <Text style={styles.messageText}>{formError}</Text>
+        </View>
+      )}
+      {successMsg && (
+        <View style={styles.successBox}>
+          <Text style={styles.messageText}>{successMsg}</Text>
+        </View>
+      )}
 
       <View style={styles.form}>
         <Text style={styles.label}>Paciente</Text>
@@ -159,15 +178,27 @@ export default function PlanTurnoScreen() {
           onChangeText={(text) => setForm({ ...form, observaciones: text })}
         />
 
-        <Button title="Crear Turno" onPress={handleSubmit} />
+        <PrimaryButton
+          onPress={handleSubmit}
+          accessibilityRole="button"
+          accessibilityLabel="Crear turno"
+        >
+          <PrimaryButtonLabel>Crear Turno</PrimaryButtonLabel>
+        </PrimaryButton>
       </View>
 
       <Text style={styles.sectionTitle}>Turnos Registrados</Text>
 
-      {loading && <ActivityIndicator size="large" color="#000" />}
-      {error && <Text style={styles.error}>Error: {error}</Text>}
+      {loading && (
+        <ActivityIndicator size="large" color={theme.colors.actionPrimary} />
+      )}
+      {error && (
+        <View style={styles.errorBox}>
+          <Text style={styles.messageText}>Error: {error}</Text>
+        </View>
+      )}
       {!loading && planes.length === 0 && (
-        <Text>No hay turnos registrados todavía.</Text>
+        <Text style={styles.bodyText}>No hay turnos registrados todavía.</Text>
       )}
 
       <FlatList
@@ -179,44 +210,96 @@ export default function PlanTurnoScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 8 },
-  subtitle: { fontSize: 14, color: "#555", marginBottom: 16 },
-  form: { marginBottom: 20 },
-  label: { fontWeight: "600", marginBottom: 6 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 8,
-    marginBottom: 12,
-    borderRadius: 4,
-  },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 10 },
-  card: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 6,
-    padding: 12,
-    marginBottom: 10,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 6,
-  },
-  cardId: { fontWeight: "600" },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    color: "#fff",
-  },
-  badgeConfirmado: { backgroundColor: "green" },
-  badgeCancelado: { backgroundColor: "red" },
-  badgePendiente: { backgroundColor: "orange" },
-  cardBody: { marginBottom: 8 },
-  bold: { fontWeight: "600" },
-  error: { color: "red", marginBottom: 8 },
-  success: { color: "green", marginBottom: 8 },
-});
+// design-system.md §1.4: estado/error solo como borde + texto primario,
+// nunca texto pequeño en lima/ámbar/rojo sobre superficie.
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 16,
+      backgroundColor: theme.colors.background,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: "bold",
+      marginBottom: 8,
+      color: theme.colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginBottom: 16,
+    },
+    form: { marginBottom: 20 },
+    label: {
+      fontWeight: "600",
+      fontSize: 12,
+      marginBottom: 6,
+      color: theme.colors.textSecondary,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+      minHeight: 44,
+      padding: 12,
+      marginBottom: 12,
+      borderRadius: 6,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginVertical: 10,
+      color: theme.colors.textPrimary,
+    },
+    card: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 6,
+      padding: 12,
+      marginBottom: 10,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 6,
+    },
+    cardId: { fontWeight: "600", color: theme.colors.textPrimary },
+    badge: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      fontSize: 12,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      backgroundColor: theme.colors.surface,
+    },
+    badgeConfirmado: { borderColor: theme.colors.success },
+    badgeCancelado: { borderColor: theme.colors.error },
+    badgePendiente: { borderColor: theme.colors.warning },
+    cardBody: { marginBottom: 8 },
+    bodyText: { color: theme.colors.textPrimary },
+    bold: { fontWeight: "600" },
+    errorBox: {
+      backgroundColor: theme.colors.surface,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.error,
+      borderRadius: 4,
+      padding: 8,
+      marginBottom: 8,
+    },
+    successBox: {
+      backgroundColor: theme.colors.surface,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.success,
+      borderRadius: 4,
+      padding: 8,
+      marginBottom: 8,
+    },
+    messageText: { color: theme.colors.textPrimary },
+  });

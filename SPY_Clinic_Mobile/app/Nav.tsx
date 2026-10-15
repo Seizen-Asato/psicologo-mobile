@@ -1,100 +1,81 @@
-import { Link } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Link, usePathname } from "expo-router";
+import styled from "styled-components/native";
 
-// podemos separa la logica en las carpetas de cada funcionameinto para que sea mas ordenado, pero lo que pongamos en el nav
-// al usar expo router lo que hay que hacer es que crear un archivo tsx en la carpeta app por cada link que se ghaga e importar
-// la funciuonaldiad de cada carpeta
+// design-system.md §1.2/1.3 + §1.4.
+// Barra scrolleable: 7 items no caben en 360px. Táctil mínimo 44x44.
+// Activo = texto `textPrimary` 700 + subrayado `actionPrimary`
+// (lima/ámbar como texto pequeño sobre claro falla contraste, §1.4).
+
+const NAV_ITEMS: { href: any; label: string }[] = [
+  { href: "/home", label: "Inicio" },
+  { href: "/paciente", label: "Paciente" },
+  { href: "/turnos", label: "Turnos" },
+  { href: "/ListaTurnos", label: "Lista Turnos" },
+  { href: "/Psicologo", label: "Psicólogo" },
+  { href: "/PlanTurno", label: "Plan Turno" },
+  { href: "/login", label: "Login" },
+];
+
+const NavBar = styled.View`
+  background-color: ${({ theme }) => theme.colors.surface};
+  border-top-width: 1px;
+  border-top-color: ${({ theme }) => theme.colors.border};
+  elevation: 4;
+`;
+
+const NavScroll = styled.ScrollView.attrs({
+  horizontal: true,
+  showsHorizontalScrollIndicator: false,
+})`
+  flex-direction: row;
+`;
+
+const NavPress = styled.Pressable<{ $active: boolean }>`
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 12px;
+  margin-horizontal: 2px;
+  border-bottom-width: 2px;
+  border-bottom-color: ${({ theme, $active }) =>
+    $active ? theme.colors.actionPrimary : "transparent"};
+`;
+
+const NavLabel = styled.Text<{ $active: boolean }>`
+  font-size: 14px;
+  font-weight: ${({ $active }) => ($active ? "700" : "500")};
+  color: ${({ theme, $active }) =>
+    $active ? theme.colors.textPrimary : theme.colors.textSecondary};
+  text-align: center;
+`;
 
 function Nav() {
+  const pathname = usePathname();
+
   return (
-    <View style={styles.sideNav}>
-      <View style={styles.sideNavList}>
-        <View style={styles.sideNavItem}>
-          <Link href="/home" asChild>
-            <Pressable>
-              <Text style={styles.sideNavLink}>Inicio</Text>
-            </Pressable>
-          </Link>
-        </View>
-
-        <View style={styles.sideNavItem}>
-          <Link href="/paciente" asChild>
-            <Pressable>
-              <Text style={styles.sideNavLink}>Paciente</Text>
-            </Pressable>
-          </Link>
-        </View>
-
-        <View style={styles.sideNavItem}>
-          <Link href="/turnos" asChild>
-            <Pressable>
-              <Text style={styles.sideNavLink}>Turnos</Text>
-            </Pressable>
-          </Link>
-        </View>
-
-        <View style={styles.sideNavItem}>
-          <Link href="/ListaTurnos" asChild>
-            <Pressable>
-              <Text style={styles.sideNavLink}>Lista Turnos</Text>
-            </Pressable>
-          </Link>
-        </View>
-        <View style={styles.sideNavItem}>
-          <Link href="/Psicologo" asChild>
-            <Pressable>
-              <Text style={styles.sideNavLink}>Psicólogo</Text>
-            </Pressable>
-          </Link>
-        </View>
-        <View style={styles.sideNavItem}>
-          <Link href="/PlanTurno" asChild>
-            <Pressable>
-              <Text style={styles.sideNavLink}>Plan Turno</Text>
-            </Pressable>
-          </Link>
-        </View>
-        <View style={styles.sideNavItem}>
-          <Link href="/login" asChild>
-            <Pressable>
-              <Text style={styles.sideNavLink}>Login</Text>
-            </Pressable>
-          </Link>
-        </View>
-      </View>
-    </View>
+    <NavBar>
+      <NavScroll
+        contentContainerStyle={{ paddingHorizontal: 8, alignItems: "center" }}
+      >
+        {NAV_ITEMS.map((item) => {
+          const active = pathname === item.href;
+          return (
+            <Link key={item.href} href={item.href} asChild>
+              <NavPress
+                $active={active}
+                accessibilityRole="button"
+                accessibilityLabel={item.label}
+                accessibilityState={{ selected: active }}
+              >
+                <NavLabel $active={active}>{item.label}</NavLabel>
+              </NavPress>
+            </Link>
+          );
+        })}
+      </NavScroll>
+    </NavBar>
   );
 }
-
-// aunque vamos a usar styled.components esto es provisorio ya que hay unos problemas al usar styled. components pero
-// por ahora nos enfocaremso en otras coas antes que el diseño
-
-const styles = StyleSheet.create({
-  sideNav: {
-    height: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    backgroundColor: "#242222",
-    paddingHorizontal: 10,
-    elevation: 4,
-  },
-  sideNavList: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  sideNavItem: {
-    marginHorizontal: 5,
-    flexShrink: 1,
-  },
-  sideNavLink: {
-    fontSize: 16,
-    color: "#007bff",
-    fontWeight: "500",
-    textAlign: "center",
-  },
-});
 
 export default Nav;

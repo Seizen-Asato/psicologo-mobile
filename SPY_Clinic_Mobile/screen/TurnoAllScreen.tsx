@@ -3,8 +3,14 @@ import { useTurno } from "@/hooks/useTurno";
 import { TurnoDto } from "@/models/TurnoDto";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
 import TurnoFilterPicker from "@/components/TurnoFilterPicker";
+import {
+  PrimaryButton,
+  PrimaryButtonLabel,
+} from "@/style/ui/Buttons";
 
 export default function TurnoAllScreen() {
   const {
@@ -20,6 +26,8 @@ export default function TurnoAllScreen() {
     setApellido,
   } = useTurno();
   const router = useRouter();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
   useEffect(() => {
     fetchTurnosALL();
@@ -37,10 +45,13 @@ export default function TurnoAllScreen() {
 
   return (
     <View style={styles.container}>
-      <Button
-        title="Nuevo turno"
+      <PrimaryButton
         onPress={() => router.push("/turno" as any)}
-      />
+        accessibilityRole="button"
+        accessibilityLabel="Nuevo turno"
+      >
+        <PrimaryButtonLabel>Nuevo turno</PrimaryButtonLabel>
+      </PrimaryButton>
       <TurnoFilterPicker
         apellido={apellido}
         estado={estado}
@@ -92,30 +103,31 @@ export default function TurnoAllScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 12,
-    backgroundColor: "#f9f9f9",
-  },
-  message: {
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
-    color: "#555",
-  },
-  emptyContainer: {
-    alignItems: "center",
-    marginTop: 40,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: "#666",
-  },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 12,
+      backgroundColor: theme.colors.background,
+    },
+    message: {
+      textAlign: "center",
+      marginTop: 20,
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+    },
+    emptyContainer: {
+      alignItems: "center",
+      marginTop: 40,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: theme.colors.textPrimary,
+      marginBottom: 8,
+    },
+    emptySubtitle: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+  });

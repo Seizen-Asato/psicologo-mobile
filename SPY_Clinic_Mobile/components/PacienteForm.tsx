@@ -1,6 +1,9 @@
 import { PacienteDto } from "@/models/PacienteDto";
 import { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
 
 type PacienteFormProps = {
   onSave: (paciente: PacienteDto) => void;
@@ -16,6 +19,8 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
   const [Mail, setMail] = useState(selected?.Mail ?? "");
   const [Dni, setDni] = useState(selected?.Dni ?? "");
   const [Telefono, setTelefono] = useState(selected?.Telefono ?? "");
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
   const handleSubmit = () => {
     const paciente: PacienteDto = {
@@ -85,22 +90,42 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         placeholder="YYYY-MM-DD"
       />
 
-      <Button title="Guardar" onPress={handleSubmit} />
+      <PrimaryButton
+        onPress={handleSubmit}
+        accessibilityRole="button"
+        accessibilityLabel="Guardar paciente"
+      >
+        <PrimaryButtonLabel>Guardar</PrimaryButtonLabel>
+      </PrimaryButton>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  title: { fontSize: 18, fontWeight: "bold", marginBottom: 12 },
-  label: { marginBottom: 4, fontWeight: "600" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 8,
-    marginBottom: 12,
-  },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: { padding: 16, backgroundColor: theme.colors.background },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 12,
+      color: theme.colors.textPrimary,
+    },
+    label: {
+      marginBottom: 4,
+      fontWeight: "600",
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+      borderRadius: 6,
+      minHeight: 44,
+      padding: 12,
+      marginBottom: 12,
+    },
+  });
 
 export default PacienteForm;

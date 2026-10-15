@@ -1,9 +1,14 @@
 import { usePsicologo } from "@/hooks/usePsicologo";
 import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
 
 export default function PsicologoForm() {
   const { create, loading, error } = usePsicologo();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
   const [form, setForm] = useState({
     nombre: "",
@@ -72,28 +77,70 @@ export default function PsicologoForm() {
         onChangeText={(text) => setForm({ ...form, telefono: text })}
       />
 
-      <Button
-        title={loading ? "Guardando..." : "Crear Psicólogo"}
+      <PrimaryButton
         onPress={handleSubmit}
-      />
+        disabled={loading}
+        accessibilityRole="button"
+        accessibilityLabel="Crear psicólogo"
+      >
+        <PrimaryButtonLabel>
+          {loading ? "Guardando..." : "Crear Psicólogo"}
+        </PrimaryButtonLabel>
+      </PrimaryButton>
 
-      {formError && <Text style={styles.error}>{formError}</Text>}
-      {successMsg && <Text style={styles.success}>{successMsg}</Text>}
-      {error && <Text style={styles.error}>Error: {String(error)}</Text>}
+      {formError && (
+        <View style={styles.errorBox}>
+          <Text style={styles.messageText}>{formError}</Text>
+        </View>
+      )}
+      {successMsg && (
+        <View style={styles.successBox}>
+          <Text style={styles.messageText}>{successMsg}</Text>
+        </View>
+      )}
+      {error && (
+        <View style={styles.errorBox}>
+          <Text style={styles.messageText}>Error: {String(error)}</Text>
+        </View>
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: "#fff" },
-  heading: { fontSize: 18, fontWeight: "bold", marginBottom: 12 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 8,
-    marginBottom: 10,
-    borderRadius: 4,
-  },
-  error: { color: "red", marginTop: 8 },
-  success: { color: "green", marginTop: 8 },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: { padding: 16, backgroundColor: theme.colors.background },
+    heading: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 12,
+      color: theme.colors.textPrimary,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+      minHeight: 44,
+      padding: 12,
+      marginBottom: 10,
+      borderRadius: 6,
+    },
+    errorBox: {
+      backgroundColor: theme.colors.surface,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.error,
+      borderRadius: 4,
+      padding: 8,
+      marginTop: 8,
+    },
+    successBox: {
+      backgroundColor: theme.colors.surface,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.success,
+      borderRadius: 4,
+      padding: 8,
+      marginTop: 8,
+    },
+    messageText: { color: theme.colors.textPrimary },
+  });
