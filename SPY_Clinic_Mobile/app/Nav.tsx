@@ -40,7 +40,20 @@ function Nav() {
             </Pressable>
           </Link>
         </View>
-
+        <View style={styles.sideNavItem}>
+          <Link href="/Psicologo" asChild>
+            <Pressable>
+              <Text style={styles.sideNavLink}>Psicólogo</Text>
+            </Pressable>
+          </Link>
+        </View>
+        <View style={styles.sideNavItem}>
+          <Link href="/PlanTurno" asChild>
+            <Pressable>
+              <Text style={styles.sideNavLink}>Plan Turno</Text>
+            </Pressable>
+          </Link>
+        </View>
         <View style={styles.sideNavItem}>
           <Link href="/login" asChild>
             <Pressable>

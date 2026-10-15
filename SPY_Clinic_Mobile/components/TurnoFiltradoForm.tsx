@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, TextInput, View } from "react-native";
 
 interface TurnoFiltradoFormProps {
   onFilter: (filters: {
     date?: string;
-    pacienteId?: string;
-    turnoId?: string;
-    turnoPaciente?: string;
-    turnoPacienteId?: string;
+    pacienteApellido?: string;
+    pacienteNombre?: string;
   }) => void;
   onReset: () => void;
 }
@@ -16,74 +14,52 @@ const TurnoFiltradoForm: React.FC<TurnoFiltradoFormProps> = ({
   onFilter,
   onReset,
 }) => {
-  const [date, setDate] = useState("");
-  const [pacienteId, setPacienteId] = useState("");
-  const [turnoId, setTurnoId] = useState("");
-  const [turnoPaciente, setTurnoPaciente] = useState("");
-  const [turnoPacienteId, setTurnoPacienteId] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const [patientLastNameFilter, setPatientLastNameFilter] = useState("");
+  const [patientNameFilter, setPatientNameFilter] = useState("");
 
   const handleSubmit = () => {
-    onFilter({ date, pacienteId, turnoId, turnoPaciente, turnoPacienteId });
+    onFilter({
+      date: dateFilter,
+      pacienteApellido: patientLastNameFilter,
+      pacienteNombre: patientNameFilter,
+    });
+  };
+
+  const handleReset = () => {
+    setDateFilter("");
+    setPatientLastNameFilter("");
+    setPatientNameFilter("");
+    onReset();
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Filtrado</Text>
+    <View style={{ marginBottom: 20, padding: 10 }}>
+      <TextInput
+        placeholder="Paciente (apellido)"
+        value={patientLastNameFilter}
+        onChangeText={setPatientLastNameFilter}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+      />
 
       <TextInput
-        style={styles.input}
-        placeholder="Paciente ID"
-        value={pacienteId}
-        onChangeText={setPacienteId}
+        placeholder="Paciente (nombre)"
+        value={patientNameFilter}
+        onChangeText={setPatientNameFilter}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
+
       <TextInput
-        style={styles.input}
-        placeholder="Turno ID"
-        value={turnoId}
-        onChangeText={setTurnoId}
-      />
-      <TextInput
-        style={styles.input}
         placeholder="Fecha (YYYY-MM-DD)"
-        value={date}
-        onChangeText={setDate}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Turno Paciente"
-        value={turnoPaciente}
-        onChangeText={setTurnoPaciente}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Turno Paciente ID"
-        value={turnoPacienteId}
-        onChangeText={setTurnoPacienteId}
+        value={dateFilter}
+        onChangeText={setDateFilter}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
 
-      <View style={styles.actions}>
-        <Button title="Filtrar" onPress={handleSubmit} />
-        <Button title="Ver todos" color="gray" onPress={onReset} />
-      </View>
+      <Button title="Buscar" onPress={handleSubmit} />
+      <Button title="Ver todos" color="gray" onPress={handleReset} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  text: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 8,
-    marginBottom: 10,
-  },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 10,
-  },
-});
 
 export default TurnoFiltradoForm;

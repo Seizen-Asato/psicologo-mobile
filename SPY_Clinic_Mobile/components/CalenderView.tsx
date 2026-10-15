@@ -1,35 +1,56 @@
-import { useFiltroTurnos } from "@/hooks/useTurnoFilter";
 import { EventoDto } from "@/models/EventoDto";
 import { FiltroTurnosProps } from "@/models/FiltroTurnosProps";
 import React, { useState } from "react";
 import { Button, Text, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
-import TurnoFiltradoForm from "../components/TurnoFiltradoForm";
+import TurnoFiltradoForm from "./TurnoFiltradoForm";
 
 const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
   events,
   getByDate,
   getByPatient,
-  getByTurno,
-  getByTurnoPaciente,
-  getByTurnoPacienteId,
   reload,
 }) => {
   const [mode, setMode] = useState<"month" | "week" | "day">("week");
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [filteredEvents, setFilteredEvents] = useState<EventoDto[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const { filteredEvents, filterTurnos, resetTurnos, error } = useFiltroTurnos({
-    getByDate,
-    getByPatient,
-    getByTurno,
-    getByTurnoPaciente,
-    getByTurnoPacienteId,
-    reload,
-  });
+  const handleFilter = async (filters: {
+    date?: string;
+    pacienteApellido?: string;
+    pacienteNombre?: string;
+  }) => {
+    try {
+      let result: EventoDto[] = [];
+
+      if (filters.date) {
+        result = await getByDate(filters.date);
+      } else if (filters.pacienteApellido || filters.pacienteNombre) {
+        result = await getByPatient(
+          filters.pacienteApellido ?? filters.pacienteNombre ?? "",
+        );
+      } else {
+        reload();
+        result = [];
+      }
+
+      setFilteredEvents(result);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || "Error al filtrar turnos");
+    }
+  };
+
+  const handleReset = () => {
+    reload();
+    setFilteredEvents([]);
+    setError(null);
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <TurnoFiltradoForm onFilter={filterTurnos} onReset={resetTurnos} />
+      <TurnoFiltradoForm onFilter={handleFilter} onReset={handleReset} />
 
       {error && <Text style={{ color: "red" }}>{error}</Text>}
 

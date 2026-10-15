@@ -1,6 +1,6 @@
 import { TurnoDto } from "@/models/TurnoDto";
 import * as turnosService from "@/services/TurnoService";
-import { getWeekRange } from "@/utils/DateUtils";
+import { getWeekRange, isValidDate } from "@/utils/DateUtils";
 import { useState } from "react";
 
 export function useTurno() {
@@ -16,8 +16,8 @@ export function useTurno() {
     try {
       const data = await turnosService.getAll();
       setTurnos(data || []);
-    } catch (err: any) {
-      setError("Error al cargar turnos de la semana");
+    } catch {
+      setError("Error al cargar turnos");
     } finally {
       setLoading(false);
     }
@@ -29,17 +29,17 @@ export function useTurno() {
     try {
       const { desde, hasta } = getWeekRange(date);
       const data = await turnosService.getByRange(desde, hasta);
-      setTurnos(data);
-    } catch (err: any) {
+      setTurnos(data || []);
+    } catch {
       setError("Error al cargar turnos de la semana");
     } finally {
       setLoading(false);
     }
   };
-  //validacion provisoria, luego implementaremos un pop-up pero eso lo dejamos apra los siguientes sprint
+
   const validateTurno = (turno: TurnoDto) => {
     if (!turno.fecha) throw new Error("La fecha es obligatoria");
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(turno.fecha))
+    if (!isValidDate(turno.fecha))
       throw new Error("Formato de fecha inválido (YYYY-MM-DD)");
     if (!turno.hora) throw new Error("La hora es obligatoria");
     if (!/^\d{2}:\d{2}$/.test(turno.hora))
@@ -52,29 +52,21 @@ export function useTurno() {
     if (!turno.pacienteId) throw new Error("Debe seleccionar un paciente");
   };
 
-  const filterByApellido = (apellido: string, t: TurnoDto) => {
-    const A = apellido.toUpperCase();
-    const apellidoTurno = t.paciente?.Apellido?.toUpperCase() || "";
-    return apellidoTurno.startsWith(A);
-  };
-
-  const filterByEstado = (estado: string, t: TurnoDto) => {
-    return t.estado === estado;
-  };
-
   const filterTurnos = () => {
     let filtrados = turnos;
-
     if (apellido) {
-      filtrados = filtrados.filter((t) => filterByApellido(apellido, t));
+      filtrados = filtrados.filter((t) =>
+        (t.paciente?.Apellido ?? "")
+          .toUpperCase()
+          .startsWith(apellido.toUpperCase()),
+      );
     }
-
     if (estado) {
-      filtrados = filtrados.filter((t) => filterByEstado(estado, t));
+      filtrados = filtrados.filter((t) => t.estado === estado);
     }
-
     return filtrados;
   };
+
   const saveTurno = async (turno: TurnoDto) => {
     setLoading(true);
     setError(null);
@@ -94,13 +86,14 @@ export function useTurno() {
     }
   };
 
+  // 🔹 Eliminar turno
   const removeTurno = async (id: string) => {
     setLoading(true);
     setError(null);
     try {
       await turnosService.remove(id);
       await fetchTurnosSemana();
-    } catch (err: any) {
+    } catch {
       setError("Error al eliminar turno");
     } finally {
       setLoading(false);
@@ -113,14 +106,12 @@ export function useTurno() {
     error,
     apellido,
     estado,
+    setApellido,
+    setEstado,
     fetchTurnosALL,
     fetchTurnosSemana,
-    filterByApellido,
-    filterByEstado,
     filterTurnos,
     saveTurno,
     removeTurno,
-    setEstado,
-    setApellido,
   };
 }

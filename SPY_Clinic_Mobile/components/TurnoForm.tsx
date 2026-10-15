@@ -1,7 +1,10 @@
 import { useTurno } from "@/hooks/useTurno";
 import { TurnoDto } from "@/models/TurnoDto";
+import * as pacientesService from "@/services/PacienteService";
+import * as planesService from "@/services/PlanTurnoService";
+import * as psicologosService from "@/services/PsicologoService";
 import { Picker } from "@react-native-picker/picker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   StyleSheet,
@@ -23,6 +26,11 @@ export default function TurnoForm({
   onSave,
 }: TurnoFormProps) {
   const { saveTurno } = useTurno();
+
+  const [psicologos, setPsicologos] = useState<any[]>([]);
+  const [pacientes, setPacientes] = useState<any[]>([]);
+  const [planes, setPlanes] = useState<any[]>([]);
+
   const [turno, setTurno] = useState<TurnoDto>({
     fecha: "",
     hora: "",
@@ -35,12 +43,28 @@ export default function TurnoForm({
     pacienteId: "",
     planTurnoId: "",
     descripcion: "",
+    url: "",
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setPsicologos(await psicologosService.getAll());
+      setPacientes(await pacientesService.getAll());
+      setPlanes(await planesService.getAll());
+    };
+    fetchData();
+  }, []);
 
   const handleSubmit = async () => {
     try {
-      await saveTurno(turno);
-      onSave(turno);
+      const payload: TurnoDto = {
+        ...turno,
+        psicologoId: turno.psicologoId,
+        pacienteId: turno.pacienteId,
+        planTurnoId: turno.planTurnoId,
+      };
+      await saveTurno(payload);
+      onSave(payload);
       onReset?.();
     } catch (error: any) {
       alert(error.message);
@@ -124,24 +148,59 @@ export default function TurnoForm({
           setTurno({ ...turno, cantidadTurnos: Number(val) || 1 })
         }
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Psicólogo ID"
-        value={turno.psicologoId}
-        onChangeText={(text) => setTurno({ ...turno, psicologoId: text })}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Paciente ID"
-        value={turno.pacienteId}
-        onChangeText={(text) => setTurno({ ...turno, pacienteId: text })}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Plan Turno ID"
-        value={turno.planTurnoId}
-        onChangeText={(text) => setTurno({ ...turno, planTurnoId: text })}
-      />
+
+      <Text style={styles.label}>Psicólogo</Text>
+      <Picker
+        selectedValue={turno.psicologoId}
+        onValueChange={(value) =>
+          setTurno({ ...turno, psicologoId: String(value) })
+        }
+      >
+        <Picker.Item label="Seleccione..." value="" />
+        {psicologos.map((p) => (
+          <Picker.Item
+            key={p.psicologoId}
+            label={`${p.nombre} ${p.apellido}`}
+            value={p.psicologoId}
+          />
+        ))}
+      </Picker>
+
+      <Text style={styles.label}>Paciente</Text>
+      <Picker
+        selectedValue={turno.pacienteId}
+        onValueChange={(value) =>
+          setTurno({ ...turno, pacienteId: String(value) })
+        }
+      >
+        <Picker.Item label="Seleccione..." value="" />
+        {pacientes.map((p) => (
+          <Picker.Item
+            key={p.pacienteId}
+            label={`${p.nombre} ${p.apellido}`}
+            value={p.pacienteId}
+          />
+        ))}
+      </Picker>
+
+      {/* 🔹 Picker de planes */}
+      <Text style={styles.label}>Plan de Turno</Text>
+      <Picker
+        selectedValue={turno.planTurnoId}
+        onValueChange={(value) =>
+          setTurno({ ...turno, planTurnoId: String(value) })
+        }
+      >
+        <Picker.Item label="Seleccione..." value="" />
+        {planes.map((pl) => (
+          <Picker.Item
+            key={pl.planTurnoId}
+            label={pl.planTurnoNombre}
+            value={pl.planTurnoId}
+          />
+        ))}
+      </Picker>
+
       <TextInput
         style={[styles.input, { height: 80 }]}
         placeholder="Descripción"
@@ -164,22 +223,14 @@ export default function TurnoForm({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
   heading: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 16,
     textAlign: "center",
   },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
+  label: { fontSize: 14, fontWeight: "600", marginBottom: 8 },
   switchRow: {
     flexDirection: "row",
     alignItems: "center",
