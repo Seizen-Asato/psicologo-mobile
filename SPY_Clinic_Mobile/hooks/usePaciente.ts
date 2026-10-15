@@ -9,8 +9,6 @@ export function usePaciente({
   update,
   remove,
 }: PacienteProps) {
-  //logic to fetch all pacientes from the API and return them as an array of PacienteDto
-
   const queryClient = useQueryClient();
 
   const {

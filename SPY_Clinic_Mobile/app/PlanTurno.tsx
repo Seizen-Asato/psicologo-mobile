@@ -1,10 +1,12 @@
 import PlanTurnoScreen from "@/screen/PlanTurnoScreen";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 export default function PlanTurno() {
   return (
-    <View>
-      <PlanTurnoScreen />
-    </View>
+    <ScrollView>
+      <View>
+        <PlanTurnoScreen />
+      </View>
+    </ScrollView>
   );
 }

@@ -4,7 +4,6 @@ import { PsicologoDto } from "@/models/PsicolgoDto";
 import * as pacientesService from "@/services/PacienteService";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
-
 import {
   ActivityIndicator,
   Button,
@@ -14,6 +13,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+
 export interface PlanTurnoDto {
   planTurnoId?: number;
   fecha: string;
@@ -21,6 +21,7 @@ export interface PlanTurnoDto {
   paciente: PacienteDto;
   psicologo: PsicologoDto;
 }
+
 export default function PlanTurnoScreen() {
   const { planes, loading, error, createPlan, deletePlan } = usePlanTurno();
   const [pacientes, setPacientes] = useState<PacienteDto[]>([]);
@@ -113,85 +114,102 @@ export default function PlanTurnoScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Gestión de Plan Turnos</Text>
-      <Text style={styles.subtitle}>
-        Crea nuevos turnos y visualiza el listado en tiempo real.
-      </Text>
+    <FlatList
+      style={styles.container}
+      data={planes}
+      keyExtractor={(item) => String(item.id || item._id)}
+      renderItem={renderTurno}
+      ListHeaderComponent={
+        <View>
+          <Text style={styles.title}>Gestión de Plan Turnos</Text>
+          <Text style={styles.subtitle}>
+            Crea nuevos turnos y visualiza el listado en tiempo real.
+          </Text>
 
-      {formError && <Text style={styles.error}>{formError}</Text>}
-      {successMsg && <Text style={styles.success}>{successMsg}</Text>}
+          {formError && <Text style={styles.error}>{formError}</Text>}
+          {successMsg && <Text style={styles.success}>{successMsg}</Text>}
 
-      <View style={styles.form}>
-        <Text style={styles.label}>Paciente</Text>
-        <Picker
-          selectedValue={form.paciente?.Id || ""}
-          onValueChange={(value) =>
-            setForm({
-              ...form,
-              paciente: pacientes.find((p) => p.Id === Number(value)) ?? null,
-            })
-          }
-        >
-          <Picker.Item label="Seleccione..." value="" />
-          {pacientes.map((p) => (
-            <Picker.Item
-              key={p.Id}
-              label={`${p.Nombre} ${p.Apellido}`}
-              value={p.Id}
+          <View style={styles.formCard}>
+            <Text style={styles.label}>Paciente</Text>
+            <Picker
+              style={styles.input}
+              selectedValue={form.paciente?.Id || ""}
+              onValueChange={(value) =>
+                setForm({
+                  ...form,
+                  paciente:
+                    pacientes.find((p) => p.Id === Number(value)) ?? null,
+                })
+              }
+            >
+              <Picker.Item label="Seleccione..." value="" />
+              {pacientes.map((p) => (
+                <Picker.Item
+                  key={p.Id}
+                  label={`${p.Nombre} ${p.Apellido}`}
+                  value={p.Id}
+                />
+              ))}
+            </Picker>
+
+            <Text style={styles.label}>Fecha y Hora</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="YYYY-MM-DDTHH:mm"
+              value={form.fecha}
+              onChangeText={(text) => setForm({ ...form, fecha: text })}
             />
-          ))}
-        </Picker>
 
-        <Text style={styles.label}>Fecha y Hora</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="YYYY-MM-DDTHH:mm"
-          value={form.fecha}
-          onChangeText={(text) => setForm({ ...form, fecha: text })}
-        />
+            <Text style={styles.label}>Observaciones</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Detalles adicionales..."
+              value={form.observaciones}
+              onChangeText={(text) => setForm({ ...form, observaciones: text })}
+            />
 
-        <Text style={styles.label}>Observaciones</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Detalles adicionales..."
-          value={form.observaciones}
-          onChangeText={(text) => setForm({ ...form, observaciones: text })}
-        />
+            <View style={styles.buttonContainer}>
+              <Button title="Crear Turno" onPress={handleSubmit} />
+            </View>
+          </View>
 
-        <Button title="Crear Turno" onPress={handleSubmit} />
-      </View>
+          <Text style={styles.sectionTitle}>Turnos Registrados</Text>
 
-      <Text style={styles.sectionTitle}>Turnos Registrados</Text>
-
-      {loading && <ActivityIndicator size="large" color="#000" />}
-      {error && <Text style={styles.error}>Error: {error}</Text>}
-      {!loading && planes.length === 0 && (
-        <Text>No hay turnos registrados todavía.</Text>
-      )}
-
-      <FlatList
-        data={planes}
-        keyExtractor={(item) => String(item.id || item._id)}
-        renderItem={renderTurno}
-      />
-    </View>
+          {loading && <ActivityIndicator size="large" color="#000" />}
+          {error && <Text style={styles.error}>Error: {error}</Text>}
+          {!loading && planes.length === 0 && (
+            <Text>No hay turnos registrados todavía.</Text>
+          )}
+        </View>
+      }
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 16, backgroundColor: "#f5f5f5" },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 8 },
   subtitle: { fontSize: 14, color: "#555", marginBottom: 16 },
-  form: { marginBottom: 20 },
+  formCard: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 20,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
   label: { fontWeight: "600", marginBottom: 6 },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    padding: 8,
+    padding: 10,
     marginBottom: 12,
-    borderRadius: 4,
+    borderRadius: 6,
+    backgroundColor: "#fff",
   },
+  buttonContainer: { marginTop: 12, marginBottom: 20 },
   sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 10 },
   card: {
     borderWidth: 1,
@@ -199,6 +217,8 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     marginBottom: 10,
+    backgroundColor: "#fff",
+    elevation: 2,
   },
   cardHeader: {
     flexDirection: "row",
