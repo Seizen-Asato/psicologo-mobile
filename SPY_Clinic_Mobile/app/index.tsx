@@ -1,9 +1,5 @@
-import { View } from "react-native-reanimated/lib/typescript/Animated";
+import LoginMobile from "../components/LoginForm";
 
-export const HomeScreen = () => {
-  return (
-    <View>
-      <text>Test</text>
-    </View>
-  );
-};
+export default function Index() {
+  return <LoginMobile />;
+}

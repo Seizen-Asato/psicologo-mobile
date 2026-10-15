@@ -6,6 +6,11 @@
       "sourceType": "autoskills-registry",
       "computedHash": "2174f783a038a7ca4869c4c18e14726ec13b9c6b705d59253f647d0ca37cb78d"
     },
+    "building-native-ui": {
+      "source": "expo/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "5bfac6ea4750cb2bf6d2b703ebb8d524d447c80f9e7bf9b5a55f6f7544e6c246"
+    },
     "composition-patterns": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "autoskills-registry",
@@ -30,6 +35,11 @@
       "source": "expo/skills",
       "sourceType": "autoskills-registry",
       "computedHash": "41700282a58ec518b85696827b36804831b3e2216274b3442fcc3158cb79ecd1"
+    },
+    "expo-api-routes": {
+      "source": "expo/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "8b4ce4d0ab40f0633dfc202c2b91bcf4c6d318393634a37960c37b1c2f9d7893"
     },
     "expo-data-fetching": {
       "source": "expo/skills",
@@ -61,6 +71,11 @@
       "sourceType": "autoskills-registry",
       "computedHash": "a4e6516a601f72ffd8bcd0d64609e8ba724d2ce92569a059a6890a5caadf072b"
     },
+    "native-data-fetching": {
+      "source": "expo/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "ce74c0616f566814d0c9a82585817719f39f82853bf1a50c9e590e0c7c7051f4"
+    },
     "nodejs-backend-patterns": {
       "source": "wshobson/agents",
       "sourceType": "autoskills-registry",
@@ -84,7 +99,12 @@
     "typescript-advanced-types": {
       "source": "wshobson/agents",
       "sourceType": "autoskills-registry",
-      "computedHash": "cb5d18bc19191b388cc49c15ff98dcbc714fa343373d078be00833e8a18ef291"
+      "computedHash": "5ca0e177c6aaaba1889255691224daafdb7d71f317cc70bede1590d3907ded42"
+    },
+    "use-dom": {
+      "source": "expo/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "77b56e964db680ac3efc8e11bba139d199285b08ecc5d94a6c433069537251d3"
     }
   }
 }
