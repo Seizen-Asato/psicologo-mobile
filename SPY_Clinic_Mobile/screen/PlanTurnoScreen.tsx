@@ -24,8 +24,8 @@ import {
 
 export interface PlanTurnoDto {
   planTurnoId?: number;
-  fecha: string;
-  observaciones?: string;
+  fechaInicio: string;
+  fechaFin: string;
   paciente: PacienteDto;
   psicologo: PsicologoDto;
 }
@@ -37,12 +37,12 @@ export default function PlanTurnoScreen() {
   const [pacientes, setPacientes] = useState<PacienteDto[]>([]);
   const [form, setForm] = useState<{
     paciente: PacienteDto | null;
-    fecha: string;
-    observaciones: string;
+    fechaInicio: string;
+    fechaFin: string;
   }>({
     paciente: null,
-    fecha: "",
-    observaciones: "",
+    fechaInicio: "",
+    fechaFin: "",
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -67,49 +67,57 @@ export default function PlanTurnoScreen() {
       pacienteId: form.paciente.Id,
       pacienteNombre: form.paciente.Nombre,
       pacienteApellido: form.paciente.Apellido,
-      fecha: form.fecha ? new Date(form.fecha).toISOString() : null,
-      observaciones: form.observaciones,
+      fechaInicio: form.fechaInicio
+        ? new Date(form.fechaInicio).toISOString().split("T")[0]
+        : null,
+      fechaFin: form.fechaFin
+        ? new Date(form.fechaFin).toISOString().split("T")[0]
+        : null,
     };
 
     const result = await createPlan(payload);
 
     if (result.success) {
       setSuccessMsg("¡Plan Turno creado con éxito!");
-      setForm({ paciente: null, fecha: "", observaciones: "" });
+      setForm({ paciente: null, fechaInicio: "", fechaFin: "" });
     } else {
       setFormError(result.error);
     }
   };
 
-  const renderTurno = ({ item }: { item: any }) => {
-    const turnoId = item.id || item._id;
+  const renderTurno = ({ item }: { item: PlanTurnoDto }) => {
+    const pTId = item.planTurnoId;
     return (
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardId}>ID: {turnoId}</Text>
-          <Text style={[styles.badge, getEstadoBadgeStyle(item.estado)]}>
-            {item.estado || "Pendiente"}
-          </Text>
+          <Text style={styles.cardActivo}>Estado: </Text>
+          {new Date(item.fechaFin) >= new Date() ? "Pendiente" : "Finalizado"}
         </View>
         <View style={styles.cardBody}>
           <Text style={styles.bodyText}>
-            <Text style={styles.bold}>Paciente ID:</Text>{" "}
-            {item.pacienteId || "N/A"}
+            <Text style={styles.bold}>Nombre del Paciente:</Text>{" "}
+            {item.paciente.Nombre || "N/A"}
           </Text>
           <Text style={styles.bodyText}>
-            <Text style={styles.bold}>Fecha:</Text>{" "}
-            {item.fecha
-              ? new Date(item.fecha).toLocaleString()
+            <Text style={styles.bold}>Apellido del Paciente:</Text>{" "}
+            {item.paciente.Apellido || "N/A"}
+          </Text>
+          <Text style={styles.bodyText}>
+            <Text style={styles.bold}>FechaInicio:</Text>{" "}
+            {item.fechaInicio
+              ? new Date(item.fechaInicio).toLocaleDateString()
               : "No especificada"}
           </Text>
-          {item.observaciones && (
-            <Text style={styles.bodyText}>
-              <Text style={styles.bold}>Obs:</Text> {item.observaciones}
-            </Text>
-          )}
+
+          <Text style={styles.bodyText}>
+            <Text style={styles.bold}>FechaFin:</Text>{" "}
+            {item.fechaFin
+              ? new Date(item.fechaFin).toLocaleDateString()
+              : "No especificada"}
+          </Text>
         </View>
         <DangerButton
-          onPress={() => deletePlan(turnoId)}
+          onPress={() => pTId && deletePlan(String(pTId))}
           accessibilityRole="button"
           accessibilityLabel="Eliminar turno"
         >
@@ -119,17 +127,11 @@ export default function PlanTurnoScreen() {
     );
   };
 
-  const getEstadoBadgeStyle = (estado: string) => {
-    if (estado === "Confirmado") return styles.badgeConfirmado;
-    if (estado === "Cancelado") return styles.badgeCancelado;
-    return styles.badgePendiente;
-  };
-
   return (
     <FlatList
       style={styles.container}
       data={planes}
-      keyExtractor={(item) => String(item.id || item._id)}
+      keyExtractor={(item) => String(item.planTurnoId)}
       renderItem={renderTurno}
       ListHeaderComponent={
         <View>
@@ -172,20 +174,20 @@ export default function PlanTurnoScreen() {
               ))}
             </Picker>
 
-            <Text style={styles.label}>Fecha y Hora</Text>
+            <Text style={styles.label}>Fecha y Hora de Inicio</Text>
             <TextInput
               style={styles.input}
               placeholder="YYYY-MM-DDTHH:mm"
-              value={form.fecha}
-              onChangeText={(text) => setForm({ ...form, fecha: text })}
+              value={form.fechaInicio}
+              onChangeText={(text) => setForm({ ...form, fechaInicio: text })}
             />
 
-            <Text style={styles.label}>Observaciones</Text>
+            <Text style={styles.label}>Fecha y Hora de Fin</Text>
             <TextInput
               style={styles.input}
-              placeholder="Detalles adicionales..."
-              value={form.observaciones}
-              onChangeText={(text) => setForm({ ...form, observaciones: text })}
+              placeholder="YYYY-MM-DDTHH:mm"
+              value={form.fechaFin}
+              onChangeText={(text) => setForm({ ...form, fechaFin: text })}
             />
 
             <PrimaryButton
@@ -193,11 +195,11 @@ export default function PlanTurnoScreen() {
               accessibilityRole="button"
               accessibilityLabel="Crear turno"
             >
-              <PrimaryButtonLabel>Crear Turno</PrimaryButtonLabel>
+              <PrimaryButtonLabel>Crear Plan</PrimaryButtonLabel>
             </PrimaryButton>
           </View>
 
-          <Text style={styles.sectionTitle}>Turnos Registrados</Text>
+          <Text style={styles.sectionTitle}> Plan de Turnos Registrados</Text>
 
           {loading && (
             <ActivityIndicator
@@ -212,7 +214,7 @@ export default function PlanTurnoScreen() {
           )}
           {!loading && planes.length === 0 && (
             <Text style={styles.bodyText}>
-              No hay turnos registrados todavía.
+              No hay nignun plan de turnos registrados todavía.
             </Text>
           )}
         </View>
@@ -290,7 +292,7 @@ const makeStyles = (theme: DefaultTheme) =>
       alignItems: "center",
       marginBottom: 6,
     },
-    cardId: {
+    cardActivo: {
       fontWeight: "600",
       color: theme.colors.textPrimary,
     },
