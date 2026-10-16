@@ -1,8 +1,9 @@
+import { PsicologoDto } from "@/models/PsicolgoDto";
 import * as psicologoService from "@/services/PsicologoService";
 import { useEffect, useState } from "react";
 
 export function usePsicologo() {
-  const [psicologos, setPsicologos] = useState<any[]>([]);
+  const [psicologos, setPsicologos] = useState<PsicologoDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,7 +20,7 @@ export function usePsicologo() {
     }
   };
 
-  const create = async (dto: any) => {
+  const create = async (dto: PsicologoDto) => {
     setLoading(true);
     setError(null);
     try {
@@ -34,11 +35,11 @@ export function usePsicologo() {
     }
   };
 
-  const update = async (id: number, dto: any) => {
+  const update = async (id: number, dto: PsicologoDto) => {
     try {
       const result = await psicologoService.update(id, dto);
       setPsicologos((prev) =>
-        prev.map((p) => (p.psicologoId === id ? result : p)),
+        prev.map((p) => (Number(p.psicologoId) === id ? result : p)),
       );
       return result;
     } catch (err: any) {
@@ -50,7 +51,7 @@ export function usePsicologo() {
   const remove = async (id: number) => {
     try {
       await psicologoService.remove(id);
-      setPsicologos((prev) => prev.filter((p) => p.psicologoId !== id));
+      setPsicologos((prev) => prev.filter((p) => Number(p.psicologoId) !== id));
     } catch (err: any) {
       setError(err.message);
       throw err;

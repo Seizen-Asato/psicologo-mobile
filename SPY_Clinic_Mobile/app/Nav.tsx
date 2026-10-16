@@ -13,6 +13,7 @@ const NAV_ITEMS: { href: any; label: string }[] = [
   { href: "/ListaTurnos", label: "Lista Turnos" },
   { href: "/Psicologo", label: "Psicólogo" },
   { href: "/PlanTurno", label: "Plan Turno" },
+  { href: "/Consultorio", label: " Consultorio" },
   { href: "/login", label: "Login" },
 ];
 

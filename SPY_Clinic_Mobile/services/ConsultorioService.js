@@ -19,7 +19,7 @@ export async function create(data) {
   });
 }
 
-export async function update(data, id) {
+export async function update(id, data) {
   return await fetchApi(`${BASE_URL}/consultorio/${id}`, {
     method: "PUT",
     headers: {
