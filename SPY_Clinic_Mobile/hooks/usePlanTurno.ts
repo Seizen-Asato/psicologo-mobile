@@ -46,5 +46,12 @@ export function usePlanTurno() {
     }
   };
 
-  return { planes, loading, error, fetchPlanes, createPlan, deletePlan };
+  return {
+    planes,
+    loading,
+    error,
+    fetchPlanes,
+    createPlan,
+    deletePlan,
+  };
 }

@@ -57,7 +57,7 @@ export default function ConsultorioForm() {
     // Modalidad obligatoria
     if (!form.tipoModalidadNombre.trim()) {
       setFormError(
-        "El nombre de la modalidad es obligatorio, tiene que agregar si es prescencial o citrual",
+        "El nombre de la modalidad es obligatorio, tiene que agregar si es prescencial o vitrual",
       );
       return;
     }
@@ -119,6 +119,10 @@ export default function ConsultorioForm() {
     <View style={styles.container}>
       <Text style={styles.heading}>Nuevo Consultorio</Text>
 
+      <Text>Nombre</Text>
+
+      <Text>{`Ingrese el nombre del consultorio o puede poner "Consultorio de (su nombre)"`}</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Nombre"
@@ -126,13 +130,17 @@ export default function ConsultorioForm() {
         onChangeText={(text) => setForm({ ...form, nombre: text })}
       />
 
+      <Text>Calle</Text>
+      <Text>Solo si su cosnultorio tiene dreccion prescencial</Text>
       <TextInput
         style={styles.input}
         placeholder="Calle"
         value={form.calle}
         onChangeText={(text) => setForm({ ...form, calle: text })}
       />
+      <Text>Número</Text>
 
+      <Text>Solo si su cosnultorio tiene dreccion prescencial</Text>
       <TextInput
         style={styles.input}
         placeholder="Número"
@@ -140,6 +148,7 @@ export default function ConsultorioForm() {
         value={form.numero}
         onChangeText={(text) => setForm({ ...form, numero: text })}
       />
+
       <View style={styles.inputGroup}>
         <Text>Tipo de modalidad</Text>
         <Picker

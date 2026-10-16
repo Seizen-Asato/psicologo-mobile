@@ -7,6 +7,7 @@ import {
   SecondaryButton,
   SecondaryButtonLabel,
 } from "../style/ui/Buttons";
+import AsistenciaComponent from "./AsistenciaComponent";
 
 interface TurnoCardProps {
   turno: TurnoDto;
@@ -33,6 +34,8 @@ export function TurnoCard({ turno, onEdit, onRemove }: TurnoCardProps) {
       {turno.modalidadVirtual && (
         <Text style={styles.detail}>Sesión virtual: {turno.url}</Text>
       )}
+
+      <AsistenciaComponent turno={turno} />
 
       <View style={styles.actions}>
         <SecondaryButton

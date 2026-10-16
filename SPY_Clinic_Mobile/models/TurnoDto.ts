@@ -6,7 +6,7 @@ export interface TurnoDto {
   fecha: string;
   hora: string;
   estado: "pendiente" | "confirmado" | "cancelado";
-  asistencia: boolean;
+  asistencia?: boolean;
   minutos: number;
   modalidadVirtual: boolean;
   url?: string | null;

@@ -5,13 +5,7 @@ import * as planesService from "@/services/PlanTurnoService";
 import * as psicologosService from "@/services/PsicologoService";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
 import {
@@ -44,7 +38,6 @@ export default function TurnoForm({
     fecha: "",
     hora: "",
     estado: "pendiente",
-    asistencia: false,
     minutos: 30,
     modalidadVirtual: false,
     cantidadTurnos: 1,
@@ -110,14 +103,6 @@ export default function TurnoForm({
         <Picker.Item label="Confirmado" value="confirmado" />
         <Picker.Item label="Cancelado" value="cancelado" />
       </Picker>
-
-      <View style={styles.switchRow}>
-        <Text style={styles.rowLabel}>Asistencia</Text>
-        <Switch
-          value={turno.asistencia}
-          onValueChange={(val) => setTurno({ ...turno, asistencia: val })}
-        />
-      </View>
 
       <TextInput
         style={styles.input}
@@ -192,7 +177,6 @@ export default function TurnoForm({
         ))}
       </Picker>
 
-      {/* Picker de planes */}
       <Text style={styles.label}>Plan de Turno</Text>
       <Picker
         selectedValue={turno.planTurnoId}
@@ -223,9 +207,7 @@ export default function TurnoForm({
           style={styles.action}
           onPress={handleSubmit}
           accessibilityRole="button"
-          accessibilityLabel={
-            selectedTurno ? "Guardar cambios" : "Crear turno"
-          }
+          accessibilityLabel={selectedTurno ? "Guardar cambios" : "Crear turno"}
         >
           <PrimaryButtonLabel>
             {selectedTurno ? "Guardar cambios" : "Crear turno"}

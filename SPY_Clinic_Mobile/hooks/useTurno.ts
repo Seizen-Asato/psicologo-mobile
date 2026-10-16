@@ -86,7 +86,6 @@ export function useTurno() {
     }
   };
 
-  // 🔹 Eliminar turno
   const removeTurno = async (id: string) => {
     setLoading(true);
     setError(null);
@@ -97,6 +96,31 @@ export function useTurno() {
       setError("Error al eliminar turno");
     } finally {
       setLoading(false);
+    }
+  };
+  const markAsistio = async (id: string) => {
+    try {
+      const updated = await turnosService.update(id, { asistencia: true });
+      setTurnos((prev) => prev.map((t) => (t.turnoId === id ? updated : t)));
+      return { success: true };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.message || "Error al marcar asistencia",
+      };
+    }
+  };
+
+  const markAusente = async (id: string) => {
+    try {
+      const updated = await turnosService.update(id, { asistencia: false });
+      setTurnos((prev) => prev.map((t) => (t.turnoId === id ? updated : t)));
+      return { success: true };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.message || "Error al marcar ausencia",
+      };
     }
   };
 
@@ -113,5 +137,7 @@ export function useTurno() {
     filterTurnos,
     saveTurno,
     removeTurno,
+    markAsistio,
+    markAusente,
   };
 }
