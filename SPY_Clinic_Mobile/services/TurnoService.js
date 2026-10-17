@@ -21,6 +21,10 @@ export async function getTurnosByPaciente(id, pacienteId) {
   return fetchApi(`${BASE_URL}/turno/${id}/paciente/${pacienteId}`);
 }
 
+export async function getAttendance(anio, mes) {
+  return fetchApi(`${BASE_URL}/turno/asistencia?anio=${anio}&mes=${mes}`);
+}
+
 export async function create(data) {
   return fetchApi(`${BASE_URL}/turno`, {
     method: "POST",

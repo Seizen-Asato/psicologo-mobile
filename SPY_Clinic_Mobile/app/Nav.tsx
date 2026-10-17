@@ -14,6 +14,7 @@ const NAV_ITEMS: { href: any; label: string }[] = [
   { href: "/Psicologo", label: "Psicólogo" },
   { href: "/PlanTurno", label: "Plan Turno" },
   { href: "/Consultorio", label: " Consultorio" },
+  { href: "/DashBoard", label: " Asistencia" },
   { href: "/login", label: "Login" },
 ];
 
