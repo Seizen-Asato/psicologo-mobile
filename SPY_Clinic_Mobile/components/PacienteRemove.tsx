@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
 import { DangerButton, SecondaryButtonLabel } from "../style/ui/Buttons";
+import { makeFeedbackStyles } from "../style/ui/Feedback";
 
 const getErrorMessage = (err: unknown) =>
   err instanceof Error ? err.message : String(err);
@@ -24,6 +25,7 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
 }) => {
   const theme = useTheme();
   const styles = makeStyles(theme);
+  const feedback = makeFeedbackStyles(theme, "error");
 
   const handleRemove = () => {
     Alert.alert(
@@ -46,7 +48,9 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
         <ActivityIndicator size="small" color={theme.colors.actionPrimary} />
       )}
       {error ? (
-        <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>
+        <View style={feedback.panel}>
+          <Text style={feedback.text}>Error: {getErrorMessage(error)}</Text>
+        </View>
       ) : null}
 
       <DangerButton
@@ -63,7 +67,6 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
 const makeStyles = (theme: DefaultTheme) =>
   StyleSheet.create({
     container: { marginVertical: 8 },
-    error: { color: theme.colors.error, marginTop: 4 },
   });
 
 export default PacienteRemove;

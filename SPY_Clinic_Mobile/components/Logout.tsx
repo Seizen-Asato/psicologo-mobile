@@ -40,10 +40,16 @@ export default function LogoutButton({ compact = false }: { compact?: boolean })
 
 const makeStyles = (theme: DefaultTheme) =>
   StyleSheet.create({
+    // design-system.md §1.4 + style/ui/Buttons.ts: en una acción de peligro
+    // el color va en el BORDE y el texto va en textPrimary. El token `error`
+    // en dark da 3.88:1 y no es válido para texto pequeño.
     button: {
       minHeight: 44,
       justifyContent: "center",
-      paddingHorizontal: 8,
+      paddingHorizontal: 12,
+      borderRadius: theme.radius.small,
+      borderWidth: 1,
+      borderColor: theme.colors.error,
     },
     // Icono 44x44 táctil: mismo mínimo que el botón de texto.
     iconButton: {
@@ -51,6 +57,5 @@ const makeStyles = (theme: DefaultTheme) =>
       paddingHorizontal: 0,
       alignItems: "center",
     },
-    // Nota §1.4: error en dark sobre surface 3.88:1 (límite). Fase 5: pill con borde.
-    label: { color: theme.colors.error, fontWeight: "bold" },
+    label: { color: theme.colors.textPrimary, fontWeight: "bold" },
   });

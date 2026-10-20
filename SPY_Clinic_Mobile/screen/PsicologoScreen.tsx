@@ -5,11 +5,13 @@ import React from "react";
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
+import { makeFeedbackStyles } from "../style/ui/Feedback";
 
 export default function PsicologoScreen() {
   const { psicologos, loading, error } = usePsicologo();
   const theme = useTheme();
   const styles = makeStyles(theme);
+  const feedback = makeFeedbackStyles(theme, "error");
 
   return (
     <View style={styles.container}>
@@ -20,7 +22,11 @@ export default function PsicologoScreen() {
       {loading && (
         <ActivityIndicator size="large" color={theme.colors.actionPrimary} />
       )}
-      {error && <Text style={styles.error}>Error: {String(error)}</Text>}
+      {error && (
+        <View style={feedback.panel}>
+          <Text style={feedback.text}>Error: {String(error)}</Text>
+        </View>
+      )}
 
       <FlatList
         data={psicologos}
@@ -44,5 +50,4 @@ const makeStyles = (theme: DefaultTheme) =>
       marginBottom: 16,
       color: theme.colors.textPrimary,
     },
-    error: { color: theme.colors.error, marginTop: 8 },
   });

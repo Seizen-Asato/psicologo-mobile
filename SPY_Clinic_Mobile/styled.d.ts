@@ -40,6 +40,8 @@ interface AppThemeShape {
   };
   /** Tamaño táctil mínimo WCAG §1.4. */
   touchMin: number;
+  /** Esquema activo: permite ramificar (sombras, gráficos) sin comparar hex. */
+  scheme: "light" | "dark";
 }
 
 declare module "styled-components" {

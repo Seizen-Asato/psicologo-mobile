@@ -45,12 +45,16 @@ export const DarkColors = {
   surface: "#1e2228",
   textPrimary: "#f7fafc",
   textSecondary: "#a0aec0",
-  textDisabled: "#4a5568",
+  // gray400 y no gray600: #4a5568 sobre #1e2228 daba 2.12:1 (WCAG 1.4.3 pide
+  // 4.5:1). gray400 = #a0aec0 → 7.08:1. gray400 ya está en Primitives.
+  textDisabled: "#a0aec0",
   actionPrimary: "#a6c205",
   actionHover: "#bcd916",
   actionSecondary: "#f0ad24",
   border: "#2d3748",
-  borderInput: "#4a5568",
+  // mismo criterio que textDisabled: #4a5568 daba 2.12:1 y el borde de un
+  // input necesita 3:1 (WCAG 1.4.11).
+  borderInput: "#a0aec0",
   success: "#a6c205",
   error: "#e04814",
   warning: "#fcd34d",

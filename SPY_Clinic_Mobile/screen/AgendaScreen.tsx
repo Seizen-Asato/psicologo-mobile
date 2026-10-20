@@ -5,6 +5,7 @@ import { useTheme } from "styled-components/native";
 import AgendaForm from "../components/AgendaForm";
 import CalendarView from "../components/CalenderView";
 import { useAgenda } from "../hooks/useAgenda";
+import { makeFeedbackStyles } from "../style/ui/Feedback";
 
 const AgendaScreen = () => {
   const {
@@ -18,6 +19,7 @@ const AgendaScreen = () => {
   } = useAgenda();
   const theme = useTheme();
   const styles = makeStyles(theme);
+  const feedback = makeFeedbackStyles(theme, "error");
 
   const handleCreateAgenda = async (newAgenda: AgendaDto) => {
     await createAgenda.mutateAsync(newAgenda);
@@ -34,7 +36,9 @@ const AgendaScreen = () => {
   if (error)
     return (
       <View style={styles.feedback}>
-        <Text style={styles.errorText}>Error al cargar agendas</Text>
+        <View style={feedback.panel}>
+          <Text style={feedback.text}>Error al cargar agendas</Text>
+        </View>
       </View>
     );
 
@@ -79,5 +83,4 @@ const makeStyles = (theme: DefaultTheme) =>
       fontSize: 16,
       color: theme.colors.textSecondary,
     },
-    errorText: { marginTop: 10, fontSize: 16, color: theme.colors.error },
   });

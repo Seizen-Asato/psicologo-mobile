@@ -68,10 +68,12 @@ const makeStyles = (theme: DefaultTheme) =>
       marginVertical: 8,
       borderWidth: 1,
       borderColor: theme.colors.border,
+      // En dark la sombra no se ve (sobre #1e2228): se withdrawa la elevation
+      // y la separación la aporta el borde.
+      elevation: theme.scheme === "dark" ? 0 : 3,
       shadowColor: "#000",
-      shadowOpacity: 0.1,
+      shadowOpacity: theme.scheme === "dark" ? 0 : 0.1,
       shadowRadius: 4,
-      elevation: 3,
     },
     title: {
       fontSize: 16,

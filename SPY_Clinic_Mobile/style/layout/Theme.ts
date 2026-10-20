@@ -25,6 +25,7 @@ export const lightTheme: DefaultTheme = {
   spacing,
   radius,
   touchMin,
+  scheme: "light",
 };
 
 export const darkTheme: DefaultTheme = {
@@ -36,4 +37,5 @@ export const darkTheme: DefaultTheme = {
   spacing,
   radius,
   touchMin,
+  scheme: "dark",
 };

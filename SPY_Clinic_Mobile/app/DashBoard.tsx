@@ -1,12 +1,14 @@
 import DashboardScreen from "@/screen/DashBoardScreen";
-import { ScrollView, View } from "react-native";
+import styled from "styled-components/native";
+
+const Screen = styled.ScrollView`
+  background-color: ${({ theme }) => theme.colors.background};
+`;
 
 export default function DashBoard() {
   return (
-    <ScrollView>
-      <View>
-        <DashboardScreen />
-      </View>
-    </ScrollView>
+    <Screen contentContainerStyle={{ paddingBottom: 24 }}>
+      <DashboardScreen />
+    </Screen>
   );
 }

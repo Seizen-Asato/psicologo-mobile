@@ -248,9 +248,12 @@ const makeStyles = (theme: DefaultTheme) =>
       padding: 16,
       borderRadius: 8,
       marginBottom: 20,
-      elevation: 3,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      // En dark la sombra no aporta nada: el borde hace de separación.
+      elevation: theme.scheme === "dark" ? 0 : 3,
       shadowColor: "#000",
-      shadowOpacity: 0.1,
+      shadowOpacity: theme.scheme === "dark" ? 0 : 0.1,
       shadowRadius: 4,
     },
 

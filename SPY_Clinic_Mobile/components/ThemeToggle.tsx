@@ -99,6 +99,9 @@ const makeStyles = (theme: DefaultTheme) =>
       backgroundColor: theme.colors.background,
       borderWidth: 1,
       borderColor: theme.colors.borderInput,
+      // El anillo de foco (outlineWidth 3 + outlineOffset 2) se dibuja 5px
+      // fuera de la caja: sin este margen se solapaba con el avatar.
+      marginHorizontal: 8,
       outlineWidth: 3,
       outlineColor: theme.colors.focus,
       outlineOffset: 2,

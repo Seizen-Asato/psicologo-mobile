@@ -12,6 +12,7 @@ import {
   SecondaryButton,
   SecondaryButtonLabel,
 } from "../style/ui/Buttons";
+import { makeFeedbackStyles } from "../style/ui/Feedback";
 
 const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
   events,
@@ -25,6 +26,7 @@ const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
   const [error, setError] = useState<string | null>(null);
   const theme = useTheme();
   const styles = makeStyles(theme);
+  const feedback = makeFeedbackStyles(theme, "error");
 
   const handleFilter = async (filters: {
     date?: string;
@@ -62,7 +64,11 @@ const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
     <View style={styles.container}>
       <TurnoFiltradoForm onFilter={handleFilter} onReset={handleReset} />
 
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && (
+        <View style={feedback.panel}>
+          <Text style={feedback.text}>{error}</Text>
+        </View>
+      )}
 
       <View style={styles.modeRow}>
         {(
@@ -106,21 +112,58 @@ const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
         onPressEvent={(event: any) =>
           console.log("Evento seleccionado:", event)
         }
+        // Sin tema, react-native-big-calendar dibuja su paleta por defecto
+        // (celdas y textos claros): en dark quedaba un bloque blanco.
+        theme={makeCalendarTheme(theme)}
+        calendarContainerStyle={styles.calendarContainer}
+        calendarCellStyle={styles.calendarCell}
+        calendarCellTextStyle={styles.calendarCellText}
       />
     </View>
   );
 };
 
+/**
+ * Mapea la paleta de react-native-big-calendar a los tokens del design system.
+ * La librería fusiona esto sobre su tema por defecto con deepMerge, así que
+ * solo hay que indicar lo que se quiere cambiar.
+ */
+const makeCalendarTheme = (theme: DefaultTheme) => ({
+  palette: {
+    primary: {
+      main: theme.colors.actionPrimary,
+      contrastText: theme.colors.onAction,
+    },
+    nowIndicator: theme.colors.actionSecondary,
+    gray: {
+      100: theme.colors.border,
+      200: theme.colors.border,
+      300: theme.colors.borderInput,
+      500: theme.colors.textSecondary,
+      800: theme.colors.textPrimary,
+    },
+    moreLabel: theme.colors.textSecondary,
+  },
+});
+
 const makeStyles = (theme: DefaultTheme) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.background },
-    error: { color: theme.colors.error, marginBottom: 8 },
     modeRow: {
       flexDirection: "row",
       justifyContent: "space-around",
       marginVertical: 10,
     },
     modeButton: { flex: 1, marginHorizontal: 4 },
+    calendarContainer: {
+      backgroundColor: theme.colors.background,
+    },
+    calendarCell: {
+      backgroundColor: theme.colors.surface,
+    },
+    calendarCellText: {
+      color: theme.colors.textPrimary,
+    },
   });
 
 export default CalendarView;

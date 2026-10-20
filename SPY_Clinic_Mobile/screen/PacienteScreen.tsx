@@ -13,6 +13,7 @@ import {
   SecondaryButton,
   SecondaryButtonLabel,
 } from "../style/ui/Buttons";
+import { makeFeedbackStyles } from "../style/ui/Feedback";
 
 export default function PacienteScren() {
   const {
@@ -31,6 +32,7 @@ export default function PacienteScren() {
   });
   const theme = useTheme();
   const styles = makeStyles(theme);
+  const feedback = makeFeedbackStyles(theme, "error");
   const [selectedPaciente, setSelectedPaciente] = useState<
     PacienteDto | undefined
   >(undefined);
@@ -47,7 +49,9 @@ export default function PacienteScren() {
   if (error) {
     return (
       <View style={styles.feedback}>
-        <Text style={styles.error}>Error al cargar pacientes</Text>
+        <View style={feedback.panel}>
+          <Text style={feedback.text}>Error al cargar pacientes</Text>
+        </View>
       </View>
     );
   }
@@ -93,6 +97,6 @@ const makeStyles = (theme: DefaultTheme) =>
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: theme.colors.background,
+      padding: 16,
     },
-    error: { color: theme.colors.error, fontSize: 16 },
   });
