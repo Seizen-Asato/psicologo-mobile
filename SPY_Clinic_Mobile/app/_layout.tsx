@@ -9,11 +9,13 @@ import { useAuthStore } from "@/context/Auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Slot, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider } from "styled-components/native";
 import LoginMobile from "../components/LoginForm";
+import { useThemeStore } from "../context/Theme";
 import { darkTheme, lightTheme } from "../style/layout/Theme";
 import Header from "./Header";
 import Nav from "./Nav";
@@ -31,15 +33,26 @@ export default function Layout() {
   const user = useAuthStore((state) => state.user);
   const pathname = usePathname();
   const scheme = useColorScheme();
-  const theme = scheme === "dark" ? darkTheme : lightTheme;
+  const { preference, hydrate, hydrated } = useThemeStore();
+
+  // Preferencia del usuario si existe; si no, el ajuste del sistema.
+  const isDark =
+    (preference ?? (scheme === "dark" ? "dark" : "light")) === "dark";
+  const theme = isDark ? darkTheme : lightTheme;
 
   useEffect(() => {
-    if (fontsLoaded) {
+    void hydrate();
+  }, [hydrate]);
+
+  useEffect(() => {
+    // El splash espera también al tema: sin esto la app abre con el tema del
+    // sistema y salta al guardado (destello).
+    if (fontsLoaded && hydrated) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, hydrated]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !hydrated) {
     return null;
   }
   if (!user) {
@@ -47,6 +60,7 @@ export default function Layout() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme}>
+            <StatusBar style={isDark ? "light" : "dark"} />
             <LoginMobile />
           </ThemeProvider>
         </QueryClientProvider>
@@ -57,6 +71,7 @@ export default function Layout() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
+          <StatusBar style={isDark ? "light" : "dark"} />
           {pathname !== "/" && (
             <>
               <Header />

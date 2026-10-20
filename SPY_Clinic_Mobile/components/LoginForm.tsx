@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../context/Auth";
 import { Login } from "../services/authService";
 import {
@@ -11,15 +12,18 @@ import {
   LoginButton,
   LoginCard,
   LoginSafeArea,
+  LoginThemeToggle,
   LoginWrapper,
   Title,
 } from "../style/ui/LoginScreenStyle";
+import ThemeToggle from "./ThemeToggle";
 
 const LoginMobile = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+  const insets = useSafeAreaInsets();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -90,6 +94,10 @@ const LoginMobile = () => {
           </LoginWrapper>
         </ScrollView>
       </KeyboardAvoidingView>
+      {/* Fuera del ScrollView: sigue visible y alcanzable con el teclado abierto. */}
+      <LoginThemeToggle $top={insets.top + 12}>
+        <ThemeToggle />
+      </LoginThemeToggle>
     </LoginSafeArea>
   );
 };
