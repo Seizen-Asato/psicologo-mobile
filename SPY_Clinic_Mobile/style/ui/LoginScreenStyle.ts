@@ -6,7 +6,20 @@ import styled from "styled-components/native";
 
 export const LoginSafeArea = styled(SafeAreaView)`
   flex: 1;
+  position: relative;
   background-color: ${({ theme }) => theme.colors.background};
+`;
+
+// Toggle de tema: fijo en la esquina superior derecha, fuera del ScrollView
+// para que siga siendo alcanzable con el teclado abierto.
+// `$top` lleva el inset del safe area: los hijos absolutos se posicionan
+// respecto al padding box, sin el inset el toggle caería bajo la barra de
+// estado. Prop transitoria: no se propaga al View nativo.
+export const LoginThemeToggle = styled.View<{ $top: number }>`
+  position: absolute;
+  top: ${({ $top }) => $top}px;
+  right: 12px;
+  z-index: 10;
 `;
 
 export const LoginWrapper = styled.View`
