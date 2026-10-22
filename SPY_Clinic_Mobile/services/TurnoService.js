@@ -6,7 +6,7 @@ export async function getAll() {
 }
 
 export async function getByRange(desde, hasta) {
-  return fetchApi(`${BASE_URL}/turno?range=${desde}&hasta=${hasta}`);
+  return fetchApi(`${BASE_URL}/turno/range?desde=${desde}&hasta=${hasta}`);
 }
 
 export async function getById(id) {
@@ -26,6 +26,9 @@ export async function getAttendance(anio, mes) {
 }
 
 export async function create(data) {
+  console.log("URL:", `${BASE_URL}/turno`);
+  console.log("DATA:", data);
+
   return fetchApi(`${BASE_URL}/turno`, {
     method: "POST",
     body: JSON.stringify(data),

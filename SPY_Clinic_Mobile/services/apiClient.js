@@ -9,7 +9,10 @@ export async function fetchApi(url, options = {}) {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     };
-
+    console.log("REQUEST", {
+      url,
+      method: options?.method,
+    });
     const response = await fetch(url, { ...options, headers });
 
     if (!response.ok) {

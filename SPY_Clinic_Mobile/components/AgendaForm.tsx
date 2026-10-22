@@ -4,9 +4,10 @@ import { StyleSheet, TextInput, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
 import { AgendaDto } from "../models/AgendaDto";
-import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
+import * as consultorioService from "../services/ConsultorioService";
 import * as pacientesService from "../services/PacienteService";
 import * as psicologosService from "../services/PsicologoService";
+import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
 
 interface AgendaFormProps {
   onCreate: (agenda: AgendaDto) => Promise<void>;
@@ -15,12 +16,14 @@ interface AgendaFormProps {
 const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
   const [psicologos, setPsicologos] = useState<any[]>([]);
   const [pacientes, setPacientes] = useState<any[]>([]);
+  const [consultorio, setConsultorio] = useState<any[]>([]);
   const theme = useTheme();
   const styles = makeStyles(theme);
   const [agenda, setAgenda] = useState<AgendaDto>({
     agendaId: 0,
     psicologoId: 0,
     pacienteId: "",
+    consultorioId: "",
     diaSemana: "",
     horaInicio: "",
     horaFin: "",
@@ -33,6 +36,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
     const fetchData = async () => {
       setPsicologos(await psicologosService.getAll());
       setPacientes(await pacientesService.getAll());
+      setConsultorio(await consultorioService.getAll());
     };
     fetchData();
   }, []);
@@ -62,6 +66,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
       agendaId: 0,
       psicologoId: 0,
       pacienteId: "",
+      consultorioId: "",
       diaSemana: "",
       horaInicio: "",
       horaFin: "",
@@ -124,7 +129,6 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
         ))}
       </Picker>
 
-      {/* Picker de pacientes */}
       <Picker
         selectedValue={agenda.pacienteId}
         onValueChange={(value) => setAgenda({ ...agenda, pacienteId: value })}
@@ -135,6 +139,22 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
             key={p.pacienteId}
             label={`${p.nombre} ${p.apellido}`}
             value={p.pacienteId}
+          />
+        ))}
+      </Picker>
+
+      <Picker
+        selectedValue={agenda.consultorioId}
+        onValueChange={(value) =>
+          setAgenda({ ...agenda, consultorioId: value })
+        }
+      >
+        <Picker.Item label="Seleccione consultorio..." value="" />
+        {consultorio.map((c) => (
+          <Picker.Item
+            key={c.consultorioId}
+            label={`${c.nombre}`}
+            value={c.consultorioId}
           />
         ))}
       </Picker>

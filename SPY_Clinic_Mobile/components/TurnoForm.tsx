@@ -41,9 +41,9 @@ export default function TurnoForm({
     minutos: 30,
     modalidadVirtual: false,
     cantidadTurnos: 1,
-    psicologoId: "",
-    pacienteId: "",
-    planTurnoId: "",
+    psicologoId: null,
+    pacienteId: null,
+    planTurnoId: null,
     descripcion: "",
     url: "",
   });
@@ -147,7 +147,7 @@ export default function TurnoForm({
       <Picker
         selectedValue={turno.psicologoId}
         onValueChange={(value) =>
-          setTurno({ ...turno, psicologoId: String(value) })
+          setTurno({ ...turno, psicologoId: Number(value) })
         }
       >
         <Picker.Item label="Seleccione..." value="" />
@@ -164,7 +164,7 @@ export default function TurnoForm({
       <Picker
         selectedValue={turno.pacienteId}
         onValueChange={(value) =>
-          setTurno({ ...turno, pacienteId: String(value) })
+          setTurno({ ...turno, pacienteId: Number(value) })
         }
       >
         <Picker.Item label="Seleccione..." value="" />
@@ -181,7 +181,7 @@ export default function TurnoForm({
       <Picker
         selectedValue={turno.planTurnoId}
         onValueChange={(value) =>
-          setTurno({ ...turno, planTurnoId: String(value) })
+          setTurno({ ...turno, planTurnoId: Number(value) })
         }
       >
         <Picker.Item label="Seleccione..." value="" />

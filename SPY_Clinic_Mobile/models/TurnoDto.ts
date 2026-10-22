@@ -11,9 +11,9 @@ export interface TurnoDto {
   modalidadVirtual: boolean;
   url?: string | null;
   cantidadTurnos: number;
-  psicologoId: string;
-  pacienteId: string;
-  planTurnoId: string;
+  psicologoId: number | null;
+  pacienteId: number | null;
+  planTurnoId: number | null;
   descripcion: string;
 
   paciente?: PacienteDto;
