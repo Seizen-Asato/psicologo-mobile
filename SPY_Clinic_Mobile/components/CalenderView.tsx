@@ -1,10 +1,12 @@
-import { EventoDto } from "@/models/EventoDto";
+import { AgendaDto } from "@/models/AgendaDto";
 import { FiltroTurnosProps } from "@/models/FiltroTurnosProps";
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
+import type { CalendarEvent } from "../utils/CalendarEvents";
+import { toCalendarEvents } from "../utils/CalendarEvents";
 import {
   PrimaryButton,
   PrimaryButtonLabel,
@@ -15,13 +17,15 @@ import TurnoFiltradoForm from "./TurnoFiltradoForm";
 
 const CalendarView: React.FC<
   FiltroTurnosProps & {
-    events: EventoDto[];
-    onSelectAgenda: (agenda: any) => void;
+    events: AgendaDto[];
+    onSelectAgenda: (agenda: AgendaDto) => void;
   }
 > = ({ events, getByDate, reload, onSelectAgenda }) => {
   const [mode, setMode] = useState<"month" | "week" | "day">("week");
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [filteredEvents, setFilteredEvents] = useState<EventoDto[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<AgendaDto[] | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const theme = useTheme();
   const styles = makeStyles(theme);
@@ -30,7 +34,9 @@ const CalendarView: React.FC<
     try {
       if (filters.titulo?.trim()) {
         const agendaEncontrada = events.find((agenda) =>
-          agenda.title?.toLowerCase().includes(filters.titulo!.toLowerCase()),
+          agenda.titulo
+            ?.toLowerCase()
+            .includes(filters.titulo!.toLowerCase()),
         );
 
         if (agendaEncontrada) {
@@ -40,6 +46,7 @@ const CalendarView: React.FC<
         }
 
         setError("No se encontró la agenda");
+        setFilteredEvents([]);
         return;
       }
 
@@ -51,7 +58,7 @@ const CalendarView: React.FC<
       }
 
       reload();
-      setFilteredEvents([]);
+      setFilteredEvents(null);
       setError(null);
     } catch (err: any) {
       setError(err.message ?? "Error al filtrar");
@@ -60,7 +67,7 @@ const CalendarView: React.FC<
 
   const handleReset = () => {
     reload();
-    setFilteredEvents([]);
+    setFilteredEvents(null);
     setError(null);
   };
 
@@ -105,11 +112,13 @@ const CalendarView: React.FC<
       </View>
 
       <Calendar
-        events={filteredEvents.length ? filteredEvents : events}
+        events={toCalendarEvents(filteredEvents ?? events)}
         height={600}
         mode={mode}
         date={currentDate}
-        onPressEvent={(event: any) => onSelectAgenda(event.resource)}
+        onPressEvent={(event: CalendarEvent) =>
+          onSelectAgenda(event.resource)
+        }
       />
     </View>
   );

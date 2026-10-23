@@ -1,16 +1,19 @@
 import { TurnoCard } from "@/components/TurnoCard";
+import TurnoFilterPicker from "@/components/TurnoFilterPicker";
 import { useTurno } from "@/hooks/useTurno";
 import { TurnoDto } from "@/models/TurnoDto";
+import { PrimaryButton, PrimaryButtonLabel } from "@/style/ui/Buttons";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
-import TurnoFilterPicker from "@/components/TurnoFilterPicker";
-import {
-  PrimaryButton,
-  PrimaryButtonLabel,
-} from "@/style/ui/Buttons";
 
 export default function TurnoAllScreen() {
   const {
@@ -46,7 +49,7 @@ export default function TurnoAllScreen() {
   return (
     <View style={styles.container}>
       <PrimaryButton
-        onPress={() => router.push("/turno" as any)}
+        onPress={() => router.push("/turnos" as any)}
         accessibilityRole="button"
         accessibilityLabel="Nuevo turno"
       >
@@ -79,12 +82,16 @@ export default function TurnoAllScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             {turnos.length === 0 ? (
-              <>
+              <TouchableOpacity
+                style={styles.emptyButton}
+                onPress={() => router.push("/turno" as any)}
+                activeOpacity={0.7}
+              >
                 <Text style={styles.emptyTitle}>No hay turnos registrados</Text>
                 <Text style={styles.emptySubtitle}>
                   Presiona “Nuevo turno” para crear uno.
                 </Text>
-              </>
+              </TouchableOpacity>
             ) : (
               <>
                 <Text style={styles.emptyTitle}>
@@ -119,6 +126,10 @@ const makeStyles = (theme: DefaultTheme) =>
     emptyContainer: {
       alignItems: "center",
       marginTop: 40,
+    },
+    emptyButton: {
+      alignItems: "center",
+      padding: 16,
     },
     emptyTitle: {
       fontSize: 18,
