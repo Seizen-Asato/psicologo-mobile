@@ -10,52 +10,37 @@ import {
 } from "../style/ui/Buttons";
 
 interface TurnoFiltradoFormProps {
-  onFilter: (filters: {
-    date?: string;
-    pacienteApellido?: string;
-    pacienteNombre?: string;
-  }) => void;
+  onFilter: (filters: { titulo?: string; date?: string }) => void;
+
   onReset: () => void;
 }
-
 const TurnoFiltradoForm: React.FC<TurnoFiltradoFormProps> = ({
   onFilter,
   onReset,
 }) => {
   const [dateFilter, setDateFilter] = useState("");
-  const [patientLastNameFilter, setPatientLastNameFilter] = useState("");
-  const [patientNameFilter, setPatientNameFilter] = useState("");
+  const [tituloFilter, setTituloFilter] = useState("");
+
   const theme = useTheme();
   const styles = makeStyles(theme);
-
   const handleSubmit = () => {
     onFilter({
+      titulo: tituloFilter,
       date: dateFilter,
-      pacienteApellido: patientLastNameFilter,
-      pacienteNombre: patientNameFilter,
     });
   };
-
   const handleReset = () => {
+    setTituloFilter("");
     setDateFilter("");
-    setPatientLastNameFilter("");
-    setPatientNameFilter("");
     onReset();
   };
 
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Paciente (apellido)"
-        value={patientLastNameFilter}
-        onChangeText={setPatientLastNameFilter}
-        style={styles.input}
-      />
-
-      <TextInput
-        placeholder="Paciente (nombre)"
-        value={patientNameFilter}
-        onChangeText={setPatientNameFilter}
+        placeholder="Título"
+        value={tituloFilter}
+        onChangeText={setTituloFilter}
         style={styles.input}
       />
 

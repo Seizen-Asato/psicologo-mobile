@@ -5,20 +5,20 @@ import { StyleSheet, Text, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
-import TurnoFiltradoForm from "./TurnoFiltradoForm";
 import {
   PrimaryButton,
   PrimaryButtonLabel,
   SecondaryButton,
   SecondaryButtonLabel,
 } from "../style/ui/Buttons";
+import TurnoFiltradoForm from "./TurnoFiltradoForm";
 
-const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
-  events,
-  getByDate,
-  getByPatient,
-  reload,
-}) => {
+const CalendarView: React.FC<
+  FiltroTurnosProps & {
+    events: EventoDto[];
+    onSelectAgenda: (agenda: any) => void;
+  }
+> = ({ events, getByDate, reload, onSelectAgenda }) => {
   const [mode, setMode] = useState<"month" | "week" | "day">("week");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [filteredEvents, setFilteredEvents] = useState<EventoDto[]>([]);
@@ -26,29 +26,35 @@ const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
   const theme = useTheme();
   const styles = makeStyles(theme);
 
-  const handleFilter = async (filters: {
-    date?: string;
-    pacienteApellido?: string;
-    pacienteNombre?: string;
-  }) => {
+  const handleFilter = async (filters: { date?: string; titulo?: string }) => {
     try {
-      let result: EventoDto[] = [];
-
-      if (filters.date) {
-        result = await getByDate(filters.date);
-      } else if (filters.pacienteApellido || filters.pacienteNombre) {
-        result = await getByPatient(
-          filters.pacienteApellido ?? filters.pacienteNombre ?? "",
+      if (filters.titulo?.trim()) {
+        const agendaEncontrada = events.find((agenda) =>
+          agenda.title?.toLowerCase().includes(filters.titulo!.toLowerCase()),
         );
-      } else {
-        reload();
-        result = [];
+
+        if (agendaEncontrada) {
+          setError(null);
+          setFilteredEvents([agendaEncontrada]);
+          return;
+        }
+
+        setError("No se encontró la agenda");
+        return;
       }
 
-      setFilteredEvents(result);
+      if (filters.date) {
+        const result = await getByDate(filters.date);
+        setFilteredEvents(result);
+        setError(null);
+        return;
+      }
+
+      reload();
+      setFilteredEvents([]);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Error al filtrar turnos");
+      setError(err.message ?? "Error al filtrar");
     }
   };
 
@@ -103,9 +109,7 @@ const CalendarView: React.FC<FiltroTurnosProps & { events: EventoDto[] }> = ({
         height={600}
         mode={mode}
         date={currentDate}
-        onPressEvent={(event: any) =>
-          console.log("Evento seleccionado:", event)
-        }
+        onPressEvent={(event: any) => onSelectAgenda(event.resource)}
       />
     </View>
   );

@@ -2,20 +2,17 @@ import { AgendaDto } from "@/models/AgendaDto";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
+
+import { useRouter } from "expo-router";
+
 import AgendaForm from "../components/AgendaForm";
 import CalendarView from "../components/CalenderView";
 import { useAgenda } from "../hooks/useAgenda";
 
 const AgendaScreen = () => {
-  const {
-    agenda,
-    isLoading,
-    error,
-    createAgenda,
-    getAgendaByDate,
-    getAgendaByPatient,
-    reload,
-  } = useAgenda();
+  const router = useRouter();
+  const { agenda, isLoading, error, createAgenda, getAgendaByDate, reload } =
+    useAgenda();
   const theme = useTheme();
   const styles = makeStyles(theme);
 
@@ -42,11 +39,17 @@ const AgendaScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Agenda de Psicólogos</Text>
       <AgendaForm onCreate={handleCreateAgenda} />
+
       <CalendarView
         events={agenda}
         getByDate={getAgendaByDate}
-        getByPatient={getAgendaByPatient}
         reload={reload}
+        onSelectAgenda={(agendaData) => {
+          router.push({
+            pathname: "/AgendaFormEdicion",
+            params: { agenda: JSON.stringify(agendaData) },
+          });
+        }}
       />
     </View>
   );
