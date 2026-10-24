@@ -1,9 +1,9 @@
-import { useTurno } from "@/hooks/useTurno";
 import { TurnoDto } from "@/models/TurnoDto";
 import * as pacientesService from "@/services/PacienteService";
 import * as planesService from "@/services/PlanTurnoService";
 import * as psicologosService from "@/services/PsicologoService";
 import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
@@ -26,13 +26,13 @@ export default function TurnoForm({
   onReset,
   onSave,
 }: TurnoFormProps) {
-  const { saveTurno } = useTurno();
   const theme = useTheme();
   const styles = makeStyles(theme);
 
   const [psicologos, setPsicologos] = useState<any[]>([]);
   const [pacientes, setPacientes] = useState<any[]>([]);
   const [planes, setPlanes] = useState<any[]>([]);
+  const router = useRouter();
 
   const [turno, setTurno] = useState<TurnoDto>({
     fecha: "",
@@ -57,6 +57,26 @@ export default function TurnoForm({
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (selectedTurno) {
+      setTurno(selectedTurno);
+    } else {
+      setTurno({
+        fecha: "",
+        hora: "",
+        estado: "pendiente",
+        minutos: 30,
+        modalidadVirtual: false,
+        cantidadTurnos: 1,
+        psicologoId: null,
+        pacienteId: null,
+        planTurnoId: null,
+        descripcion: "",
+        url: "",
+      });
+    }
+  }, [selectedTurno]);
+
   const handleSubmit = async () => {
     try {
       const payload: TurnoDto = {
@@ -65,9 +85,9 @@ export default function TurnoForm({
         pacienteId: turno.pacienteId,
         planTurnoId: turno.planTurnoId,
       };
-      await saveTurno(payload);
       onSave(payload);
       onReset?.();
+      router.push("/ListaTurnos");
     } catch (error: any) {
       alert(error.message);
     }

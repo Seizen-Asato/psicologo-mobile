@@ -1,5 +1,6 @@
 import { TurnoDto } from "@/models/TurnoDto";
 import { StyleSheet, Text, View } from "react-native";
+
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
 import {
@@ -22,10 +23,11 @@ export function TurnoCard({ turno, onEdit, onRemove }: TurnoCardProps) {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>
-        {turno.fecha} {turno.hora} - {turno.estado.toUpperCase()}
+        {turno.fecha} {turno.hora} -{" "}
+        {(turno.estado ?? "pendiente").toUpperCase()}
       </Text>
       <Text style={styles.subtitle}>
-        Paciente: {turno.paciente?.Nombre} {turno.paciente?.Apellido}
+        Paciente: {turno.paciente?.nombre} {turno.paciente?.apellido}
       </Text>
       <Text style={styles.subtitle}>
         Psicólogo: {turno.psicologo?.nombre} {turno.psicologo?.apellido}

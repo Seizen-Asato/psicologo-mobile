@@ -36,8 +36,6 @@ export default function TurnoAllScreen() {
     fetchTurnosALL();
   }, []);
 
-  console.log("Turnos:", turnos.length);
-
   if (loading) {
     return <Text style={styles.message}>Cargando turnos...</Text>;
   }
@@ -72,11 +70,14 @@ export default function TurnoAllScreen() {
             turno={item}
             onEdit={(t) =>
               router.push({
-                pathname: "/turno",
+                pathname: "/turnos",
                 params: { id: t.turnoId },
               } as any)
             }
-            onRemove={(id) => removeTurno(id)}
+            onRemove={async (id) => {
+              await removeTurno(id);
+              await fetchTurnosALL();
+            }}
           />
         )}
         ListEmptyComponent={

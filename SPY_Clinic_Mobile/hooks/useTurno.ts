@@ -37,6 +37,10 @@ export function useTurno() {
     }
   };
 
+  const fetchTurnoById = async (id: number) => {
+    return await turnosService.getById(id);
+  };
+
   const validateTurno = (turno: TurnoDto) => {
     if (!turno.fecha) throw new Error("La fecha es obligatoria");
     if (!isValidDate(turno.fecha))
@@ -56,7 +60,7 @@ export function useTurno() {
     let filtrados = turnos;
     if (apellido) {
       filtrados = filtrados.filter((t) =>
-        (t.paciente?.Apellido ?? "")
+        (t.paciente?.apellido ?? "")
           .toUpperCase()
           .startsWith(apellido.toUpperCase()),
       );
@@ -133,6 +137,7 @@ export function useTurno() {
     setApellido,
     setEstado,
     fetchTurnosALL,
+    fetchTurnoById,
     fetchTurnosSemana,
     filterTurnos,
     saveTurno,

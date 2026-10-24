@@ -1,7 +1,7 @@
 export interface PacienteDto {
   Id?: number;
-  Nombre: string;
-  Apellido: string;
+  nombre: string;
+  apellido: string;
   Dni: string;
   Telefono: string;
   Mail: string;
