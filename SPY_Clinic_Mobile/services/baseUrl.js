@@ -11,7 +11,7 @@ if (Platform.OS === "android" && !Device.isDevice) {
   BASE_URL = "http://localhost:5008/api";
 } else {
   // Dispositivo físico
-  BASE_URL = "http://192.168.100.36:5008/api";
+  BASE_URL = "http://192.168.0.221:5008/api";
 }
 
 export { BASE_URL };

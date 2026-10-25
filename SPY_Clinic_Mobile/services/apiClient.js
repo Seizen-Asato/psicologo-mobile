@@ -9,7 +9,8 @@ export async function fetchApi(url, options = {}) {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     };
-
+    console.log("🔍 Petición API:", options.method ?? "GET", url);
+    console.trace("📍 Origen de la petición");
     const response = await fetch(url, { ...options, headers });
 
     if (!response.ok) {

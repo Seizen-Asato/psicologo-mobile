@@ -16,25 +16,38 @@ type PacienteFormProps = {
 };
 
 const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
-  const [Nombre, setNombre] = useState(selected?.Nombre ?? "");
-  const [Apellido, setApellido] = useState(selected?.Apellido ?? "");
-  const [fechaNacimiento, setFechaNacimiento] = useState(
-    selected?.fechaNacimiento ?? new Date(),
-  );
+  const [nombre, setNombre] = useState(selected?.nombre ?? "");
+  const [apellido, setApellido] = useState(selected?.apellido ?? "");
+  const [dni, setDni] = useState(selected?.dni ?? "");
+  const [telefono, setTelefono] = useState(selected?.telefono ?? "");
+  const [email, setEmail] = useState(selected?.email ?? "");
+
+  const [fechaNacimiento, setFechaNacimiento] = useState<Date>(() => {
+    if (selected?.fechaNacimiento) {
+      const fecha = new Date(`${selected.fechaNacimiento}T00:00:00`);
+      if (!Number.isNaN(fecha.getTime())) return fecha;
+    }
+
+    return new Date();
+  });
+
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
-  const [Mail, setMail] = useState(selected?.Mail ?? "");
-  const [Dni, setDni] = useState(selected?.Dni ?? "");
-  const [Telefono, setTelefono] = useState(selected?.Telefono ?? "");
 
   const handleSubmit = () => {
     const paciente: PacienteDto = {
-      Id: selected?.Id,
-      Nombre,
-      Apellido,
-      Mail,
-      Dni,
-      Telefono,
-      fechaNacimiento,
+      pacienteId: selected?.pacienteId,
+      nombre: nombre.trim(),
+      apellido: apellido.trim(),
+      dni: dni.trim() || null,
+      telefono: telefono.trim() || null,
+      email: email.trim() || null,
+      fechaNacimiento: [
+        fechaNacimiento.getFullYear(),
+        String(fechaNacimiento.getMonth() + 1).padStart(2, "0"),
+        String(fechaNacimiento.getDate()).padStart(2, "0"),
+      ].join("-"),
+      numeroPaciente: selected?.numeroPaciente ?? null,
+      planTurnoId: selected?.planTurnoId ?? null,
     };
 
     onSave(paciente);
@@ -47,7 +60,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       <Text style={styles.label}>Nombre</Text>
       <TextInput
         style={styles.input}
-        value={Nombre}
+        value={nombre}
         onChangeText={setNombre}
         placeholder="Ingrese nombre"
       />
@@ -55,7 +68,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       <Text style={styles.label}>Apellido</Text>
       <TextInput
         style={styles.input}
-        value={Apellido}
+        value={apellido}
         onChangeText={setApellido}
         placeholder="Ingrese apellido"
       />
@@ -63,7 +76,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       <Text style={styles.label}>DNI</Text>
       <TextInput
         style={styles.input}
-        value={Dni}
+        value={dni}
         onChangeText={setDni}
         placeholder="Ingrese DNI"
         keyboardType="numeric"
@@ -72,19 +85,20 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       <Text style={styles.label}>Teléfono</Text>
       <TextInput
         style={styles.input}
-        value={Telefono}
+        value={telefono}
         onChangeText={setTelefono}
         placeholder="Ingrese teléfono"
         keyboardType="phone-pad"
       />
 
-      <Text style={styles.label}>Mail</Text>
+      <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
-        value={Mail}
-        onChangeText={setMail}
+        value={email}
+        onChangeText={setEmail}
         placeholder="Ingrese correo electrónico"
         keyboardType="email-address"
+        autoCapitalize="none"
       />
 
       <Text style={styles.label}>Fecha de nacimiento</Text>
@@ -104,8 +118,11 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
           mode="date"
           display="calendar"
           maximumDate={new Date()}
-          onValueChange={(_event, date) => {
-            setFechaNacimiento(date);
+          onChange={(_event, date) => {
+            if (date) {
+              setFechaNacimiento(date);
+            }
+
             setMostrarCalendario(false);
           }}
           onDismiss={() => setMostrarCalendario(false)}

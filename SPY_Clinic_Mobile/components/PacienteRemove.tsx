@@ -2,13 +2,13 @@ import React from "react";
 import {
   ActivityIndicator,
   Alert,
-  Button,
+  Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
-// ✅ Función auxiliar arriba del componente
 const getErrorMessage = (err: unknown) =>
   err instanceof Error ? err.message : String(err);
 
@@ -44,19 +44,38 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
 
   return (
     <View style={styles.container}>
-      {isLoading && <ActivityIndicator size="small" color="#007AFF" />}
+      {isLoading ? (
+        <ActivityIndicator size="small" color="#D9534F" />
+      ) : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Eliminar a ${pacienteNombre}`}
+          onPress={handleRemove}
+          style={styles.actionButton}
+        >
+          <Feather name="trash-2" size={20} color="#D9534F" />
+        </Pressable>
+      )}
+
       {error != null && (
         <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>
       )}
-
-      <Button title="Eliminar paciente" color="red" onPress={handleRemove} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { marginVertical: 8 },
-  error: { color: "red", marginTop: 4 },
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionButton: {
+    padding: 8,
+  },
+  error: {
+    color: "red",
+    marginTop: 4,
+  },
 });
 
 export default PacienteRemove;
