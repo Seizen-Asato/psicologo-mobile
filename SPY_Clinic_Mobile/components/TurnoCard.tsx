@@ -1,6 +1,7 @@
 import { TurnoDto } from "@/models/TurnoDto";
+import { compartirTurno } from "@/utils/CompartirTurno";
+import { useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
-
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
 import {
@@ -19,9 +20,10 @@ interface TurnoCardProps {
 export function TurnoCard({ turno, onEdit, onRemove }: TurnoCardProps) {
   const theme = useTheme();
   const styles = makeStyles(theme);
+  const cardRef = useRef<View>(null);
 
   return (
-    <View style={styles.card}>
+    <View style={styles.card} ref={cardRef}>
       <Text style={styles.title}>
         {turno.fecha} {turno.hora} -{" "}
         {(turno.estado ?? "pendiente").toUpperCase()}
@@ -56,6 +58,12 @@ export function TurnoCard({ turno, onEdit, onRemove }: TurnoCardProps) {
         >
           <SecondaryButtonLabel>Eliminar</SecondaryButtonLabel>
         </DangerButton>
+        <SecondaryButton
+          style={styles.action}
+          onPress={() => compartirTurno(cardRef)}
+        >
+          <SecondaryButtonLabel>Compartir</SecondaryButtonLabel>
+        </SecondaryButton>
       </View>
     </View>
   );
