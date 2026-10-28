@@ -1,12 +1,19 @@
 import { usePlanTurno } from "@/hooks/usePlanTurno";
+import {
+  type PlanTurno,
+  type CreatePlanTurnoPayload,
+} from "@/services/PlanTurnoService";
 import { PacienteDto } from "@/models/PacienteDto";
-import { PsicologoDto } from "@/models/PsicolgoDto";
 import * as pacientesService from "@/services/PacienteService";
 import { Picker } from "@react-native-picker/picker";
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -22,12 +29,48 @@ import {
   SecondaryButtonLabel,
 } from "../style/ui/Buttons";
 
-export interface PlanTurnoDto {
-  planTurnoId?: number;
-  fechaInicio: string;
-  fechaFin: string;
-  paciente: PacienteDto;
-  psicologo: PsicologoDto;
+const isDateLike = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+
+type PacienteNombreLike = {
+  nombre?: string;
+  apellido?: string;
+  Nombre?: string;
+  Apellido?: string;
+};
+
+/** Muestra nombre y apellido tolerando mayúscula/minúscula distinta según la API. */
+function nombrePaciente(pac?: PacienteNombreLike | null) {
+  if (!pac) return "";
+  // Las columnas char() de SQL traen relleno de espacios: trim en cada parte.
+  const nombre = (pac.nombre ?? pac.Nombre ?? "").trim();
+  const apellido = (pac.apellido ?? pac.Apellido ?? "").trim();
+  return [nombre, apellido].filter(Boolean).join(" ");
+}
+
+/** ID del paciente tolerando "Id" (dto mobile) o "pacienteId" (API camelCase). */
+function idPaciente(p?: PacienteNombreLike | { Id?: number; pacienteId?: number } | null) {
+  if (!p) return undefined;
+  return (
+    (p as { Id?: number }).Id ??
+    (p as { pacienteId?: number }).pacienteId ??
+    undefined
+  );
+}
+
+const pad2 = (n: number) => String(n).padStart(2, "0");
+
+/** "YYYY-MM-DDTHH:mm" a partir de un Date (lo que espera el formulario). */
+function fechaAForma(date: Date) {
+  return (
+    `${pad2(date.getDate())}/${pad2(date.getMonth() + 1)}/${date.getFullYear()}` +
+    ` ${pad2(date.getHours())}:${pad2(date.getMinutes())}`
+  );
+}
+
+/** Parsea el valor del form ("YYYY-MM-DDTHH:mm") a Date. */
+function formaADate(valor: string) {
+  if (!isDateLike.test(valor)) return new Date();
+  return new Date(valor);
 }
 
 export default function PlanTurnoScreen() {
@@ -39,18 +82,29 @@ export default function PlanTurnoScreen() {
     paciente: PacienteDto | null;
     fechaInicio: string;
     fechaFin: string;
+    cantidadTurno: string;
   }>({
     paciente: null,
     fechaInicio: "",
     fechaFin: "",
+    cantidadTurno: "",
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [pickerCampo, setPickerCampo] = useState<"fechaInicio"|"fechaFin"|null>(null);
+  const [pickerModo, setPickerModo] = useState<"date"|"time">("date");
+  const [tempDate, setTempDate] = useState(new Date());
 
   useEffect(() => {
     const fetchData = async () => {
-      setPacientes(await pacientesService.getAll());
+      try {
+        const data = await pacientesService.getAll();
+        setPacientes(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setFormError("No se pudieron cargar los pacientes.");
+      }
     };
+
     fetchData();
   }, []);
 
@@ -59,67 +113,173 @@ export default function PlanTurnoScreen() {
     setSuccessMsg(null);
 
     if (!form.paciente) {
-      setFormError("Agregar al paciente es obligatorio");
+      setFormError("Seleccionar un paciente es obligatorio.");
       return;
     }
 
-    const payload = {
-      pacienteId: form.paciente.Id,
-      pacienteNombre: form.paciente.Nombre,
-      pacienteApellido: form.paciente.Apellido,
-      fechaInicio: form.fechaInicio
-        ? new Date(form.fechaInicio).toISOString().split("T")[0]
-        : null,
-      fechaFin: form.fechaFin
-        ? new Date(form.fechaFin).toISOString().split("T")[0]
-        : null,
+    if (!form.fechaInicio || !form.fechaFin) {
+      setFormError("Las fechas de inicio y fin son obligatorias.");
+      return;
+    }
+
+    if (!form.cantidadTurno || Number(form.cantidadTurno) < 1) {
+      setFormError(
+        "La cantidad de turnos es obligatoria y debe ser mayor a 0.",
+      );
+      return;
+    }
+
+    const fechaInicio = new Date(form.fechaInicio);
+    const fechaFin = new Date(form.fechaFin);
+
+    if (
+      Number.isNaN(fechaInicio.getTime()) ||
+      Number.isNaN(fechaFin.getTime())
+    ) {
+      setFormError("Las fechas ingresadas no son válidas.");
+      return;
+    }
+
+    if (fechaFin <= fechaInicio) {
+      setFormError(
+        "La fecha y hora de fin debe ser posterior a la fecha y hora de inicio.",
+      );
+      return;
+    }
+
+    const payload: CreatePlanTurnoPayload = {
+      pacienteId: Number(idPaciente(form.paciente)),
+      // El backend (PlanTurnoDto.cs) usa DateOnly: solo acepta "YYYY-MM-DD".
+      fechaInicio: form.fechaInicio.slice(0, 10),
+      fechaFin: form.fechaFin.slice(0, 10),
+      cantidadTurno: Number(form.cantidadTurno),
     };
 
     const result = await createPlan(payload);
 
     if (result.success) {
-      setSuccessMsg("¡Plan Turno creado con éxito!");
-      setForm({ paciente: null, fechaInicio: "", fechaFin: "" });
+      setSuccessMsg("¡Plan de turno creado con éxito!");
+      setForm({
+        paciente: null,
+        fechaInicio: "",
+        fechaFin: "",
+        cantidadTurno: "",
+      });
     } else {
-      setFormError(result.error);
+      setFormError(result.error || "Error al crear el plan de turno.");
     }
   };
 
-  const renderTurno = ({ item }: { item: PlanTurnoDto }) => {
-    const pTId = item.planTurnoId;
+  const abrirSelector = (campo: "fechaInicio" | "fechaFin") => {
+    setPickerCampo(campo);
+    setPickerModo("date");
+    setTempDate(formaADate(form[campo]));
+  };
+
+  const confirmarSelector = (event: DateTimePickerEvent, date?: Date) => {
+    const campo = pickerCampo;
+    setPickerCampo(null);
+
+    if (event.type === "dismissed" || !date || !campo) return;
+
+    if (pickerModo === "date") {
+      setTempDate(date);
+      setPickerModo("time");
+      setPickerCampo(campo);
+      return;
+    }
+
+    // Modo "time": combino la fecha elegida con la hora elegida.
+    const base = tempDate;
+    const fechaCompleta = new Date(
+      base.getFullYear(),
+      base.getMonth(),
+      base.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+    );
+
+    setForm((prev) => ({
+      ...prev,
+      [campo]: fechaCompleta.toISOString(),
+    }));
+  };
+
+  const handleDelete = async (id: number | string | undefined) => {
+    if (id == null) return;
+
+    const result = await deletePlan(String(id));
+
+    if (!result.success) {
+      setFormError(result.error || "No se pudo eliminar el plan.");
+      return;
+    }
+
+    setSuccessMsg("Plan de turno eliminado correctamente.");
+    setFormError(null);
+  };
+
+  const renderTurno = ({ item, index }: { item: PlanTurno; index: number }) => {
+    const pTId =
+      item.planTurnoId ??
+      (item as unknown as { id?: number }).id ??
+      (item as unknown as { _id?: string })._id;
+
+    const finalizado =
+      item.fechaFin && new Date(item.fechaFin) < new Date();
+
     return (
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardActivo}>Estado: </Text>
-          {new Date(item.fechaFin) >= new Date() ? "Pendiente" : "Finalizado"}
+          <Text style={styles.cardActivo}>Plan #{pTId ?? "N/A"}</Text>
+
+          <View
+            style={[
+              styles.badge,
+              finalizado ? styles.badgeCancelado : styles.badgePendiente,
+            ]}
+          >
+            <Text style={styles.badgeText}>
+              {finalizado ? "Finalizado" : "Pendiente"}
+            </Text>
+          </View>
         </View>
+
         <View style={styles.cardBody}>
           <Text style={styles.bodyText}>
-            <Text style={styles.bold}>Nombre del Paciente:</Text>{" "}
-            {item.paciente.Nombre || "N/A"}
+            <Text style={styles.bold}>Paciente(s):</Text>{" "}
+            {Array.isArray(item.pacientes) && item.pacientes.length > 0
+              ? item.pacientes.map((pac) => nombrePaciente(pac)).join(", ")
+              : item.paciente
+                ? nombrePaciente(item.paciente) || "N/A"
+                : "N/A"}
           </Text>
+
           <Text style={styles.bodyText}>
-            <Text style={styles.bold}>Apellido del Paciente:</Text>{" "}
-            {item.paciente.Apellido || "N/A"}
+            <Text style={styles.bold}>Cantidad de turnos:</Text>{" "}
+            {item.cantidadTurno ?? "N/A"}
           </Text>
+
           <Text style={styles.bodyText}>
-            <Text style={styles.bold}>FechaInicio:</Text>{" "}
+            <Text style={styles.bold}>Fecha de inicio:</Text>{" "}
             {item.fechaInicio
-              ? new Date(item.fechaInicio).toLocaleDateString()
+              ? new Date(item.fechaInicio).toLocaleString()
               : "No especificada"}
           </Text>
 
           <Text style={styles.bodyText}>
-            <Text style={styles.bold}>FechaFin:</Text>{" "}
+            <Text style={styles.bold}>Fecha de fin:</Text>{" "}
             {item.fechaFin
-              ? new Date(item.fechaFin).toLocaleDateString()
+              ? new Date(item.fechaFin).toLocaleString()
               : "No especificada"}
           </Text>
         </View>
+
         <DangerButton
-          onPress={() => pTId && deletePlan(String(pTId))}
+          onPress={() => handleDelete(pTId)}
+          disabled={pTId == null}
           accessibilityRole="button"
-          accessibilityLabel="Eliminar turno"
+          accessibilityLabel="Eliminar plan de turno"
         >
           <SecondaryButtonLabel>Eliminar</SecondaryButtonLabel>
         </DangerButton>
@@ -128,16 +288,24 @@ export default function PlanTurnoScreen() {
   };
 
   return (
+    <>
     <FlatList
       style={styles.container}
       data={planes}
-      keyExtractor={(item) => String(item.planTurnoId)}
+      keyExtractor={(item, index) =>
+        String(
+          item.planTurnoId ??
+            (item as unknown as { id?: number }).id ??
+            (item as unknown as { _id?: string })._id ??
+            index,
+        )
+      }
       renderItem={renderTurno}
       ListHeaderComponent={
         <View>
-          <Text style={styles.title}>Gestión de Plan Turnos</Text>
+          <Text style={styles.title}>Gestión de Planes de Turnos</Text>
           <Text style={styles.subtitle}>
-            Crea nuevos turnos y visualiza el listado en tiempo real.
+            Crea nuevos planes de turnos y visualiza los registrados.
           </Text>
 
           {formError && (
@@ -155,51 +323,79 @@ export default function PlanTurnoScreen() {
             <Text style={styles.label}>Paciente</Text>
             <Picker
               style={styles.input}
-              selectedValue={form.paciente?.Id || ""}
+              selectedValue={idPaciente(form.paciente) ?? ""}
               onValueChange={(value) =>
                 setForm({
                   ...form,
                   paciente:
-                    pacientes.find((p) => p.Id === Number(value)) ?? null,
+                    pacientes.find((p) => idPaciente(p) === Number(value)) ??
+                    null,
                 })
               }
             >
-              <Picker.Item label="Seleccione..." value="" />
+              <Picker.Item label="Seleccione un paciente..." value="" />
               {pacientes.map((p) => (
                 <Picker.Item
-                  key={p.Id}
-                  label={`${p.Nombre} ${p.Apellido}`}
-                  value={p.Id}
+                  key={idPaciente(p)}
+                  label={nombrePaciente(p)}
+                  value={idPaciente(p)}
                 />
               ))}
             </Picker>
 
-            <Text style={styles.label}>Fecha y Hora de Inicio</Text>
-            <TextInput
+            <Text style={styles.label}>Fecha y hora de inicio (desde)</Text>
+            <Pressable
               style={styles.input}
-              placeholder="YYYY-MM-DDTHH:mm"
-              value={form.fechaInicio}
-              onChangeText={(text) => setForm({ ...form, fechaInicio: text })}
-            />
+              onPress={() => abrirSelector("fechaInicio")}
+              accessibilityRole="button"
+              accessibilityLabel="Seleccionar fecha y hora de inicio"
+            >
+              <Text style={[
+                styles.pickerText,
+                !form.fechaInicio && styles.pickerPlaceholder,
+              ]}>
+                {form.fechaInicio ? fechaAForma(formaADate(form.fechaInicio)) : "Seleccionar..."}
+              </Text>
+            </Pressable>
 
-            <Text style={styles.label}>Fecha y Hora de Fin</Text>
+            <Text style={styles.label}>Fecha y hora de fin (hasta)</Text>
+            <Pressable
+              style={styles.input}
+              onPress={() => abrirSelector("fechaFin")}
+              accessibilityRole="button"
+              accessibilityLabel="Seleccionar fecha y hora de fin"
+            >
+              <Text style={[
+                styles.pickerText,
+                !form.fechaFin && styles.pickerPlaceholder,
+              ]}>
+                {form.fechaFin ? fechaAForma(formaADate(form.fechaFin)) : "Seleccionar..."}
+              </Text>
+            </Pressable>
+
+            <Text style={styles.label}>Cantidad de turnos</Text>
             <TextInput
               style={styles.input}
-              placeholder="YYYY-MM-DDTHH:mm"
-              value={form.fechaFin}
-              onChangeText={(text) => setForm({ ...form, fechaFin: text })}
+              placeholder="1"
+              keyboardType="numeric"
+              value={form.cantidadTurno}
+              onChangeText={(text) => setForm({ ...form, cantidadTurno: text })}
             />
 
             <PrimaryButton
               onPress={handleSubmit}
+              disabled={loading}
               accessibilityRole="button"
-              accessibilityLabel="Crear turno"
+              accessibilityLabel="Crear plan de turno"
             >
               <PrimaryButtonLabel>Crear Plan</PrimaryButtonLabel>
             </PrimaryButton>
           </View>
 
-          <Text style={styles.sectionTitle}> Plan de Turnos Registrados</Text>
+          <Text style={styles.sectionTitle}>
+            {" "}
+            Planes de Turnos Registrados
+          </Text>
 
           {loading && (
             <ActivityIndicator
@@ -214,12 +410,22 @@ export default function PlanTurnoScreen() {
           )}
           {!loading && planes.length === 0 && (
             <Text style={styles.bodyText}>
-              No hay nignun plan de turnos registrados todavía.
+              No hay ningún plan de turnos registrado todavía.
             </Text>
           )}
         </View>
       }
     />
+    {pickerCampo && (
+      <DateTimePicker
+        value={tempDate}
+        mode={pickerModo}
+        is24Hour
+        display="default"
+        onChange={confirmarSelector}
+      />
+    )}
+    </>
   );
 }
 
@@ -271,6 +477,13 @@ const makeStyles = (theme: DefaultTheme) =>
       borderRadius: 6,
     },
 
+    pickerText: {
+      color: theme.colors.textPrimary,
+    },
+    pickerPlaceholder: {
+      color: theme.colors.borderInput,
+    },
+
     sectionTitle: {
       fontSize: 18,
       fontWeight: "bold",
@@ -301,6 +514,7 @@ const makeStyles = (theme: DefaultTheme) =>
     },
     bodyText: {
       color: theme.colors.textPrimary,
+      marginBottom: 4,
     },
     bold: {
       fontWeight: "600",
@@ -311,14 +525,13 @@ const makeStyles = (theme: DefaultTheme) =>
       paddingVertical: 4,
       borderRadius: 4,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      fontSize: 12,
+      fontWeight: "600",
+    },
+    badgeText: {
       fontSize: 12,
       fontWeight: "600",
       color: theme.colors.textPrimary,
-      backgroundColor: theme.colors.surface,
-    },
-    badgeConfirmado: {
-      borderColor: theme.colors.success,
     },
     badgeCancelado: {
       borderColor: theme.colors.error,

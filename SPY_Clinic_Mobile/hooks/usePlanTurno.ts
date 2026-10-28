@@ -1,8 +1,15 @@
-import { create, getAll, remove } from "@/services/PlanTurnoService";
+import {
+  create,
+  getAll,
+  remove,
+  type CreatePlanTurnoPayload,
+  type PlanTurno,
+  type ServiceResult,
+} from "@/services/PlanTurnoService";
 import { useCallback, useEffect, useState } from "react";
 
 export function usePlanTurno() {
-  const [planes, setPlanes] = useState<any[]>([]);
+  const [planes, setPlanes] = useState<PlanTurno[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +30,9 @@ export function usePlanTurno() {
     fetchPlanes();
   }, [fetchPlanes]);
 
-  const createPlan = async (formData: any) => {
+  const createPlan = async (
+    formData: CreatePlanTurnoPayload,
+  ): Promise<ServiceResult> => {
     try {
       const nuevoPlan = await create(formData);
       setPlanes((prev) => [...prev, nuevoPlan]);
@@ -33,10 +42,19 @@ export function usePlanTurno() {
     }
   };
 
-  const deletePlan = async (id: string | number) => {
+  const deletePlan = async (
+    id: string | number,
+  ): Promise<Omit<ServiceResult, "data">> => {
     try {
       await remove(id);
-      setPlanes((prev) => prev.filter((pl) => (pl.id || pl._id) !== id));
+      setPlanes((prev) =>
+        prev.filter(
+          (pl) =>
+            String(
+              (pl as any).planTurnoId ?? (pl as any).id ?? (pl as any)._id,
+            ) !== String(id),
+        ),
+      );
       return { success: true };
     } catch (err: any) {
       return {
