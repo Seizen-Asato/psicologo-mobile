@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { FechaPicker } from "./FechaHoraPicker";
 import {
   PrimaryButton,
   PrimaryButtonLabel,
@@ -57,7 +58,7 @@ export default function AgendaFormEdicion({
       />
 
       <Text style={styles.label}>Fecha</Text>
-      <TextInput style={styles.input} value={fecha} onChangeText={setFecha} />
+      <FechaPicker value={fecha} onChange={setFecha} />
 
       <View style={styles.buttons}>
         <PrimaryButton onPress={handleGuardar}>

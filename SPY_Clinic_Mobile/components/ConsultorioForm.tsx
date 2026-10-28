@@ -26,6 +26,7 @@ export default function ConsultorioForm() {
     tipoModalidadNombre: "",
   });
 
+  const [isEditing, setIsEditing] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -40,7 +41,7 @@ export default function ConsultorioForm() {
     // Nombre obligatorio
     if (!form.nombre.trim()) {
       setFormError(
-        "El nombre del consultorio es obligatorio, si no tiene puede poner 'Consultorio de {su nombre}' ",
+        "El nombre del consultorio es obligatorio, si no tiene puede poner 'Consultorio de {su nombre}'",
       );
       return;
     }
@@ -57,7 +58,7 @@ export default function ConsultorioForm() {
     // Modalidad obligatoria
     if (!form.tipoModalidadNombre.trim()) {
       setFormError(
-        "El nombre de la modalidad es obligatorio, tiene que agregar si es prescencial o vitrual",
+        "El nombre de la modalidad es obligatorio, tiene que agregar si es presencial o virtual",
       );
       return;
     }
@@ -67,25 +68,59 @@ export default function ConsultorioForm() {
       Nombre: form.nombre.trim(),
       Calle: form.calle.trim() === "" ? null : form.calle.trim(),
       Numero: form.numero === "" ? null : Number(form.numero),
-      TipoModalidadId: null, // si no lo usás, podés dejarlo null
+      TipoModalidadId: null,
       TipoModalidadNombre: form.tipoModalidadNombre.trim(),
     };
 
-    const result = await create(payload);
-    if (result?.success) {
-      setSuccessMsg("¡Consultorio creado con éxito!");
-      setForm({
-        Id: "",
-        nombre: "",
-        calle: "",
-        numero: "",
-        presencial: false,
-        virtual: false,
-        tipoModalidadNombre: "",
-      });
+    if (isEditing) {
+      // Lógica de Actualizar
+      const result = await update(form.Id, payload);
+      if (result?.success !== false) {
+        setSuccessMsg("¡Consultorio actualizado con éxito!");
+        resetForm();
+        fetchAll();
+      } else {
+        setFormError(result?.error || "No se pudo actualizar el consultorio");
+      }
     } else {
-      setFormError(result?.error || "No se pudo crear el consultorio");
+      // Lógica de Crear
+      const result = await create(payload);
+      if (result?.success !== false) {
+        setSuccessMsg("¡Consultorio creado con éxito!");
+        resetForm();
+        fetchAll();
+      } else {
+        setFormError(result?.error || "No se pudo crear el consultorio");
+      }
     }
+  };
+
+  const handleEditPress = (item: ConsultorioDto) => {
+    setIsEditing(true);
+    setForm({
+      Id: item.Id,
+      nombre: item.Nombre || "",
+      calle: item.Calle || "",
+      numero: item.Numero ? String(item.Numero) : "",
+      presencial: false,
+      virtual: false,
+      tipoModalidadNombre: item.TipoModalidadNombre || "",
+    });
+    setFormError(null);
+    setSuccessMsg(null);
+  };
+
+  const resetForm = () => {
+    setIsEditing(false);
+    setForm({
+      Id: "",
+      nombre: "",
+      calle: "",
+      numero: "",
+      presencial: false,
+      virtual: false,
+      tipoModalidadNombre: "",
+    });
   };
 
   const renderConsultorio = ({ item }: { item: ConsultorioDto }) => (
@@ -96,20 +131,7 @@ export default function ConsultorioForm() {
       </Text>
       <Text>Modalidad: {item.TipoModalidadNombre}</Text>
       <View style={styles.actions}>
-        <Button
-          title="Editar"
-          onPress={() => {
-            update(item.Id, {
-              Id: item.Id,
-              Nombre: form.nombre.trim(),
-              Calle: form.calle.trim() === "" ? null : form.calle.trim(),
-              Numero: form.numero === "" ? null : Number(form.numero),
-              TipoModalidadId: null,
-              TipoModalidadNombre: form.tipoModalidadNombre.trim(),
-            });
-          }}
-        />
-
+        <Button title="Editar" onPress={() => handleEditPress(item)} />
         <Button title="Eliminar" color="red" onPress={() => remove(item.Id)} />
       </View>
     </View>
@@ -117,12 +139,14 @@ export default function ConsultorioForm() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Nuevo Consultorio</Text>
+      <Text style={styles.heading}>
+        {isEditing ? "Editar Consultorio" : "Nuevo Consultorio"}
+      </Text>
 
       <Text>Nombre</Text>
-
-      <Text>{`Ingrese el nombre del consultorio o puede poner "Consultorio de (su nombre)"`}</Text>
-
+      <Text
+        style={styles.subtext}
+      >{`Ingrese el nombre del consultorio o puede poner "Consultorio de (su nombre)"`}</Text>
       <TextInput
         style={styles.input}
         placeholder="Nombre"
@@ -131,16 +155,20 @@ export default function ConsultorioForm() {
       />
 
       <Text>Calle</Text>
-      <Text>Solo si su cosnultorio tiene dreccion prescencial</Text>
+      <Text style={styles.subtext}>
+        Solo si su consultorio tiene dirección presencial
+      </Text>
       <TextInput
         style={styles.input}
         placeholder="Calle"
         value={form.calle}
         onChangeText={(text) => setForm({ ...form, calle: text })}
       />
-      <Text>Número</Text>
 
-      <Text>Solo si su cosnultorio tiene dreccion prescencial</Text>
+      <Text>Número</Text>
+      <Text style={styles.subtext}>
+        Solo si su consultorio tiene dirección presencial
+      </Text>
       <TextInput
         style={styles.input}
         placeholder="Número"
@@ -162,16 +190,32 @@ export default function ConsultorioForm() {
           <Picker.Item label="Virtual" value="Virtual" />
         </Picker>
       </View>
+
       <Button
-        title={loading ? "Guardando..." : "Crear Consultorio"}
+        title={
+          loading
+            ? "Guardando..."
+            : isEditing
+              ? "Actualizar Consultorio"
+              : "Crear Consultorio"
+        }
         onPress={handleSubmit}
         disabled={loading}
       />
+
+      {isEditing && (
+        <View style={{ marginTop: 10 }}>
+          <Button title="Cancelar Edición" color="gray" onPress={resetForm} />
+        </View>
+      )}
 
       {formError && <Text style={styles.error}>{formError}</Text>}
       {successMsg && <Text style={styles.success}>{successMsg}</Text>}
       {error && <Text style={styles.error}>Error: {String(error)}</Text>}
 
+      <Text style={[styles.heading, { marginTop: 20 }]}>
+        Consultorios Registrados
+      </Text>
       <FlatList
         data={consultorio}
         keyExtractor={(item) => String(item.Id)}
@@ -184,6 +228,7 @@ export default function ConsultorioForm() {
 const styles = StyleSheet.create({
   container: { padding: 16 },
   heading: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
+  subtext: { fontSize: 12, color: "#666", marginBottom: 4 },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -194,14 +239,8 @@ const styles = StyleSheet.create({
   inputGroup: {
     marginBottom: 12,
   },
-  switchRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
   card: {
-    borderWidth: 1,
+    borderWidth: globalThis ? 1 : 1, // o 1
     borderColor: "#ccc",
     padding: 12,
     marginBottom: 10,

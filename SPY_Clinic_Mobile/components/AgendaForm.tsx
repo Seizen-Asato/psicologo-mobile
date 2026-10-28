@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
+import { FechaPicker, HoraPicker } from "./FechaHoraPicker";
 import { AgendaDto } from "../models/AgendaDto";
 import * as consultorioService from "../services/ConsultorioService";
 import * as pacientesService from "../services/PacienteService";
@@ -58,9 +59,14 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
       horaInicio: horaInicioFormatted,
       horaFin: horaFinFormatted,
       diaSemana: agenda.fecha
-        ? new Date(agenda.fecha).toLocaleDateString("es-ES", {
-            weekday: "long",
-          })
+        ? /* Parse "YYYY-MM-DD" en zona local: new Date(iso) lo interpreta en
+             UTC y desfasa el weekday en zonas horarias negativas. */
+          (() => {
+            const [y, m, d] = agenda.fecha.slice(0, 10).split("-").map(Number);
+            return new Date(y, m - 1, d).toLocaleDateString("es-ES", {
+              weekday: "long",
+            });
+          })()
         : "",
     };
 
@@ -89,25 +95,21 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
         style={styles.input}
       />
 
-      <TextInput
-        placeholder="Fecha (YYYY-MM-DD)"
+      <FechaPicker
         value={agenda.fecha}
-        onChangeText={(text) => setAgenda({ ...agenda, fecha: text })}
-        style={styles.input}
+        onChange={(fecha) => setAgenda({ ...agenda, fecha })}
       />
 
-      <TextInput
-        placeholder="Hora inicio (HH:mm)"
+      <HoraPicker
         value={agenda.horaInicio}
-        onChangeText={(text) => setAgenda({ ...agenda, horaInicio: text })}
-        style={styles.input}
+        onChange={(hora) => setAgenda({ ...agenda, horaInicio: hora })}
+        placeholder="Seleccionar hora inicio..."
       />
 
-      <TextInput
-        placeholder="Hora fin (HH:mm)"
+      <HoraPicker
         value={agenda.horaFin}
-        onChangeText={(text) => setAgenda({ ...agenda, horaFin: text })}
-        style={styles.input}
+        onChange={(hora) => setAgenda({ ...agenda, horaFin: hora })}
+        placeholder="Seleccionar hora fin..."
       />
 
       <TextInput

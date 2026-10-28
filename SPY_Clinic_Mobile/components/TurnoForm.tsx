@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
+import { FechaPicker, HoraPicker } from "./FechaHoraPicker";
 import {
   PrimaryButton,
   PrimaryButtonLabel,
@@ -99,17 +100,13 @@ export default function TurnoForm({
         {selectedTurno ? "Editar turno" : "Nuevo turno"}
       </Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Fecha (YYYY-MM-DD)"
+      <FechaPicker
         value={turno.fecha}
-        onChangeText={(text) => setTurno({ ...turno, fecha: text })}
+        onChange={(fecha) => setTurno({ ...turno, fecha })}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Hora (HH:mm)"
+      <HoraPicker
         value={turno.hora}
-        onChangeText={(text) => setTurno({ ...turno, hora: text })}
+        onChange={(hora) => setTurno({ ...turno, hora })}
       />
 
       <Text style={styles.label}>Estado</Text>
