@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
+import { FechaPicker } from "./FechaHoraPicker";
 import {
   PrimaryButton,
   PrimaryButtonLabel,
@@ -44,11 +45,10 @@ const TurnoFiltradoForm: React.FC<TurnoFiltradoFormProps> = ({
         style={styles.input}
       />
 
-      <TextInput
-        placeholder="Fecha (YYYY-MM-DD)"
+      <FechaPicker
         value={dateFilter}
-        onChangeText={setDateFilter}
-        style={styles.input}
+        onChange={setDateFilter}
+        placeholder="Seleccionar fecha para filtrar..."
       />
 
       <PrimaryButton
