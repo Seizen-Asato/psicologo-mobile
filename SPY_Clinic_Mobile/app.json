@@ -4,7 +4,6 @@
     "slug": "SPY_Clinic_Mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-
     "scheme": "spyclinicmobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -40,7 +39,8 @@
       "expo-font",
       "expo-image",
       "expo-status-bar",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
