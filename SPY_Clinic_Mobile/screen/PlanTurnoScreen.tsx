@@ -1,15 +1,12 @@
 import { usePlanTurno } from "@/hooks/usePlanTurno";
 import {
-  type PlanTurno,
   type CreatePlanTurnoPayload,
+  type PlanTurno,
 } from "@/services/PlanTurnoService";
-import { PacienteDto } from "@/models/PacienteDto";
-import * as pacientesService from "@/services/PacienteService";
-import { Picker } from "@react-native-picker/picker";
 import DateTimePicker, {
   type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -31,32 +28,6 @@ import {
 
 const isDateLike = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
 
-type PacienteNombreLike = {
-  nombre?: string;
-  apellido?: string;
-  Nombre?: string;
-  Apellido?: string;
-};
-
-/** Muestra nombre y apellido tolerando mayúscula/minúscula distinta según la API. */
-function nombrePaciente(pac?: PacienteNombreLike | null) {
-  if (!pac) return "";
-  // Las columnas char() de SQL traen relleno de espacios: trim en cada parte.
-  const nombre = (pac.nombre ?? pac.Nombre ?? "").trim();
-  const apellido = (pac.apellido ?? pac.Apellido ?? "").trim();
-  return [nombre, apellido].filter(Boolean).join(" ");
-}
-
-/** ID del paciente tolerando "Id" (dto mobile) o "pacienteId" (API camelCase). */
-function idPaciente(p?: PacienteNombreLike | { Id?: number; pacienteId?: number } | null) {
-  if (!p) return undefined;
-  return (
-    (p as { Id?: number }).Id ??
-    (p as { pacienteId?: number }).pacienteId ??
-    undefined
-  );
-}
-
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
 /** "YYYY-MM-DDTHH:mm" a partir de un Date (lo que espera el formulario). */
@@ -77,45 +48,26 @@ export default function PlanTurnoScreen() {
   const { planes, loading, error, createPlan, deletePlan } = usePlanTurno();
   const theme = useTheme();
   const styles = makeStyles(theme);
-  const [pacientes, setPacientes] = useState<PacienteDto[]>([]);
   const [form, setForm] = useState<{
-    paciente: PacienteDto | null;
     fechaInicio: string;
     fechaFin: string;
     cantidadTurno: string;
   }>({
-    paciente: null,
     fechaInicio: "",
     fechaFin: "",
     cantidadTurno: "",
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [pickerCampo, setPickerCampo] = useState<"fechaInicio"|"fechaFin"|null>(null);
-  const [pickerModo, setPickerModo] = useState<"date"|"time">("date");
+  const [pickerCampo, setPickerCampo] = useState<
+    "fechaInicio" | "fechaFin" | null
+  >(null);
+  const [pickerModo, setPickerModo] = useState<"date" | "time">("date");
   const [tempDate, setTempDate] = useState(new Date());
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await pacientesService.getAll();
-        setPacientes(Array.isArray(data) ? data : []);
-      } catch (err) {
-        setFormError("No se pudieron cargar los pacientes.");
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const handleSubmit = async () => {
     setFormError(null);
     setSuccessMsg(null);
-
-    if (!form.paciente) {
-      setFormError("Seleccionar un paciente es obligatorio.");
-      return;
-    }
 
     if (!form.fechaInicio || !form.fechaFin) {
       setFormError("Las fechas de inicio y fin son obligatorias.");
@@ -148,8 +100,6 @@ export default function PlanTurnoScreen() {
     }
 
     const payload: CreatePlanTurnoPayload = {
-      pacienteId: Number(idPaciente(form.paciente)),
-      // El backend (PlanTurnoDto.cs) usa DateOnly: solo acepta "YYYY-MM-DD".
       fechaInicio: form.fechaInicio.slice(0, 10),
       fechaFin: form.fechaFin.slice(0, 10),
       cantidadTurno: Number(form.cantidadTurno),
@@ -160,7 +110,6 @@ export default function PlanTurnoScreen() {
     if (result.success) {
       setSuccessMsg("¡Plan de turno creado con éxito!");
       setForm({
-        paciente: null,
         fechaInicio: "",
         fechaFin: "",
         cantidadTurno: "",
@@ -225,9 +174,9 @@ export default function PlanTurnoScreen() {
       (item as unknown as { id?: number }).id ??
       (item as unknown as { _id?: string })._id;
 
-    const finalizado =
-      item.fechaFin && new Date(item.fechaFin) < new Date();
+    const finalizado = item.fechaFin && new Date(item.fechaFin) < new Date();
 
+    console.log("PLAN", JSON.stringify(item, null, 2));
     return (
       <View style={styles.card}>
         <View style={styles.cardHeader}>
@@ -246,15 +195,6 @@ export default function PlanTurnoScreen() {
         </View>
 
         <View style={styles.cardBody}>
-          <Text style={styles.bodyText}>
-            <Text style={styles.bold}>Paciente(s):</Text>{" "}
-            {Array.isArray(item.pacientes) && item.pacientes.length > 0
-              ? item.pacientes.map((pac) => nombrePaciente(pac)).join(", ")
-              : item.paciente
-                ? nombrePaciente(item.paciente) || "N/A"
-                : "N/A"}
-          </Text>
-
           <Text style={styles.bodyText}>
             <Text style={styles.bold}>Cantidad de turnos:</Text>{" "}
             {item.cantidadTurno ?? "N/A"}
@@ -289,145 +229,130 @@ export default function PlanTurnoScreen() {
 
   return (
     <>
-    <FlatList
-      style={styles.container}
-      data={planes}
-      keyExtractor={(item, index) =>
-        String(
-          item.planTurnoId ??
-            (item as unknown as { id?: number }).id ??
-            (item as unknown as { _id?: string })._id ??
-            index,
-        )
-      }
-      renderItem={renderTurno}
-      ListHeaderComponent={
-        <View>
-          <Text style={styles.title}>Gestión de Planes de Turnos</Text>
-          <Text style={styles.subtitle}>
-            Crea nuevos planes de turnos y visualiza los registrados.
-          </Text>
-
-          {formError && (
-            <View style={styles.errorBox}>
-              <Text style={styles.messageText}>{formError}</Text>
-            </View>
-          )}
-          {successMsg && (
-            <View style={styles.successBox}>
-              <Text style={styles.messageText}>{successMsg}</Text>
-            </View>
-          )}
-
-          <View style={styles.formCard}>
-            <Text style={styles.label}>Paciente</Text>
-            <Picker
-              style={styles.input}
-              selectedValue={idPaciente(form.paciente) ?? ""}
-              onValueChange={(value) =>
-                setForm({
-                  ...form,
-                  paciente:
-                    pacientes.find((p) => idPaciente(p) === Number(value)) ??
-                    null,
-                })
-              }
-              dropdownIconColor={theme.colors.textSecondary}
-              itemStyle={{ color: theme.colors.textPrimary }}
-            >
-              <Picker.Item label="Seleccione un paciente..." value="" />
-              {pacientes.map((p) => (
-                <Picker.Item
-                  key={idPaciente(p)}
-                  label={nombrePaciente(p)}
-                  value={idPaciente(p)}
-                />
-              ))}
-            </Picker>
-
-            <Text style={styles.label}>Fecha y hora de inicio (desde)</Text>
-            <Pressable
-              style={styles.input}
-              onPress={() => abrirSelector("fechaInicio")}
-              accessibilityRole="button"
-              accessibilityLabel="Seleccionar fecha y hora de inicio"
-            >
-              <Text style={[
-                styles.pickerText,
-                !form.fechaInicio && styles.pickerPlaceholder,
-              ]}>
-                {form.fechaInicio ? fechaAForma(formaADate(form.fechaInicio)) : "Seleccionar..."}
-              </Text>
-            </Pressable>
-
-            <Text style={styles.label}>Fecha y hora de fin (hasta)</Text>
-            <Pressable
-              style={styles.input}
-              onPress={() => abrirSelector("fechaFin")}
-              accessibilityRole="button"
-              accessibilityLabel="Seleccionar fecha y hora de fin"
-            >
-              <Text style={[
-                styles.pickerText,
-                !form.fechaFin && styles.pickerPlaceholder,
-              ]}>
-                {form.fechaFin ? fechaAForma(formaADate(form.fechaFin)) : "Seleccionar..."}
-              </Text>
-            </Pressable>
-
-            <Text style={styles.label}>Cantidad de turnos</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="1"
-              placeholderTextColor={theme.colors.textDisabled}
-              keyboardType="numeric"
-              value={form.cantidadTurno}
-              onChangeText={(text) => setForm({ ...form, cantidadTurno: text })}
-            />
-
-            <PrimaryButton
-              onPress={handleSubmit}
-              disabled={loading}
-              accessibilityRole="button"
-              accessibilityLabel="Crear plan de turno"
-            >
-              <PrimaryButtonLabel>Crear Plan</PrimaryButtonLabel>
-            </PrimaryButton>
-          </View>
-
-          <Text style={styles.sectionTitle}>
-            {" "}
-            Planes de Turnos Registrados
-          </Text>
-
-          {loading && (
-            <ActivityIndicator
-              size="large"
-              color={theme.colors.actionPrimary}
-            />
-          )}
-          {error && (
-            <View style={styles.errorBox}>
-              <Text style={styles.messageText}>Error: {error}</Text>
-            </View>
-          )}
-          {!loading && planes.length === 0 && (
-            <Text style={styles.bodyText}>
-              No hay ningún plan de turnos registrado todavía.
+      <FlatList
+        style={styles.container}
+        data={planes}
+        keyExtractor={(item, index) =>
+          String(
+            item.planTurnoId ??
+              (item as unknown as { id?: number }).id ??
+              (item as unknown as { _id?: string })._id ??
+              index,
+          )
+        }
+        renderItem={renderTurno}
+        ListHeaderComponent={
+          <View>
+            <Text style={styles.title}>Gestión de Planes de Turnos</Text>
+            <Text style={styles.subtitle}>
+              Crea nuevos planes de turnos y visualiza los registrados.
             </Text>
-          )}
-        </View>
-      }
-    />
-    {pickerCampo && (
-      <DateTimePicker
-        value={tempDate}
-        mode={pickerModo}
-        is24Hour
-        display="default"
-        onChange={confirmarSelector}
+
+            {formError && (
+              <View style={styles.errorBox}>
+                <Text style={styles.messageText}>{formError}</Text>
+              </View>
+            )}
+            {successMsg && (
+              <View style={styles.successBox}>
+                <Text style={styles.messageText}>{successMsg}</Text>
+              </View>
+            )}
+
+            <View style={styles.formCard}>
+              <Text style={styles.label}>Fecha y hora de inicio (desde)</Text>
+              <Pressable
+                style={styles.input}
+                onPress={() => abrirSelector("fechaInicio")}
+                accessibilityRole="button"
+                accessibilityLabel="Seleccionar fecha y hora de inicio"
+              >
+                <Text
+                  style={[
+                    styles.pickerText,
+                    !form.fechaInicio && styles.pickerPlaceholder,
+                  ]}
+                >
+                  {form.fechaInicio
+                    ? fechaAForma(formaADate(form.fechaInicio))
+                    : "Seleccionar..."}
+                </Text>
+              </Pressable>
+
+              <Text style={styles.label}>Fecha y hora de fin (hasta)</Text>
+              <Pressable
+                style={styles.input}
+                onPress={() => abrirSelector("fechaFin")}
+                accessibilityRole="button"
+                accessibilityLabel="Seleccionar fecha y hora de fin"
+              >
+                <Text
+                  style={[
+                    styles.pickerText,
+                    !form.fechaFin && styles.pickerPlaceholder,
+                  ]}
+                >
+                  {form.fechaFin
+                    ? fechaAForma(formaADate(form.fechaFin))
+                    : "Seleccionar..."}
+                </Text>
+              </Pressable>
+
+              <Text style={styles.label}>Cantidad de turnos</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="1"
+                placeholderTextColor={theme.colors.textDisabled}
+                keyboardType="numeric"
+                value={form.cantidadTurno}
+                onChangeText={(text) =>
+                  setForm({ ...form, cantidadTurno: text })
+                }
+              />
+
+              <PrimaryButton
+                onPress={handleSubmit}
+                disabled={loading}
+                accessibilityRole="button"
+                accessibilityLabel="Crear plan de turno"
+              >
+                <PrimaryButtonLabel>Crear Plan</PrimaryButtonLabel>
+              </PrimaryButton>
+            </View>
+
+            <Text style={styles.sectionTitle}>
+              {" "}
+              Planes de Turnos Registrados
+            </Text>
+
+            {loading && (
+              <ActivityIndicator
+                size="large"
+                color={theme.colors.actionPrimary}
+              />
+            )}
+            {error && (
+              <View style={styles.errorBox}>
+                <Text style={styles.messageText}>Error: {error}</Text>
+              </View>
+            )}
+            {!loading && planes.length === 0 && (
+              <Text style={styles.bodyText}>
+                No hay ningún plan de turnos registrado todavía.
+              </Text>
+            )}
+          </View>
+        }
       />
-    )}
+      {pickerCampo && (
+        <DateTimePicker
+          value={tempDate}
+          mode={pickerModo}
+          is24Hour
+          display="default"
+          onChange={confirmarSelector}
+        />
+      )}
     </>
   );
 }

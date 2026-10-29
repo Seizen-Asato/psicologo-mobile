@@ -1,7 +1,7 @@
-import { fetchApi } from "./apiClient";
-import { BASE_URL } from "./baseUrl";
 import { PacienteDto } from "@/models/PacienteDto";
 import { PsicologoDto } from "@/models/PsicolgoDto";
+import { fetchApi } from "./apiClient";
+import { BASE_URL } from "./baseUrl";
 
 export interface PlanTurno {
   planTurnoId?: number;
@@ -15,7 +15,6 @@ export interface PlanTurno {
 }
 
 export interface CreatePlanTurnoPayload {
-  pacienteId: number;
   fechaInicio: string;
   fechaFin: string;
   cantidadTurno: number;

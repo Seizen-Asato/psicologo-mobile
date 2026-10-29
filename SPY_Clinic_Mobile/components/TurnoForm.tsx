@@ -8,13 +8,13 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
-import { FechaPicker, HoraPicker } from "./FechaHoraPicker";
 import {
   PrimaryButton,
   PrimaryButtonLabel,
   SecondaryButton,
   SecondaryButtonLabel,
 } from "../style/ui/Buttons";
+import { FechaPicker, HoraPicker } from "./FechaHoraPicker";
 
 interface TurnoFormProps {
   selectedTurno?: TurnoDto | null;
@@ -160,6 +160,10 @@ export default function TurnoForm({
         <Text style={styles.label}>Modalidad presencial</Text>
       )}
 
+      {/* chekear si cambaimos cantidad de turnos u tuliziamos solo plan turno pero hay que ver
+        si abra que modificar la base de datos
+      */}
+      <Text style={styles.label}>Cantidad de Turnos</Text>
       <TextInput
         style={styles.input}
         placeholder="Cantidad de turnos"
@@ -185,7 +189,7 @@ export default function TurnoForm({
         {psicologos.map((p) => (
           <Picker.Item
             key={p.psicologoId}
-            label={`${p.nombre} ${p.apellido}`}
+            label={`${p.nombre.trim()} ${p.apellido.trim()}`}
             value={p.psicologoId}
           />
         ))}
@@ -205,7 +209,7 @@ export default function TurnoForm({
         {pacientes.map((p) => (
           <Picker.Item
             key={p.pacienteId}
-            label={`${p.nombre} ${p.apellido}`}
+            label={`${p.nombre.trim()} ${p.apellido.trim()}`}
             value={p.pacienteId}
           />
         ))}
@@ -225,7 +229,7 @@ export default function TurnoForm({
         {planes.map((pl) => (
           <Picker.Item
             key={pl.planTurnoId}
-            label={pl.planTurnoNombre}
+            label={`Plan #${pl.planTurnoId}`}
             value={pl.planTurnoId}
           />
         ))}

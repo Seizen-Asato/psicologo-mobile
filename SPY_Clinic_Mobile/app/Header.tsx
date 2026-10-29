@@ -1,18 +1,10 @@
-import { useWindowDimensions } from "react-native";
+import { Image, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
+
 import LogoutButton from "../components/Logout";
 import ThemeToggle from "../components/ThemeToggle";
 import { useAuthStore } from "../context/Auth";
-
-// design-system.md §1.2/1.3 — Header sobre `surface`, sin hex inventados.
-//
-// A 360px el header no cabe con todo visible: título (118) + toggle (52) +
-// avatar (48) + nombre/rol (85) + logout con texto (129) = 432px de
-// contenido contra 328px disponibles. Por debajo de COMPACT_BREAKPOINT se
-// colapsa el bloque de identidad y el logout pasa a botón-icono 44px
-// (270px), y el título se recorta con `numberOfLines` como red de seguridad:
-// con `flex-shrink` el header nunca desborda, solo se degrada.
 
 const COMPACT_BREAKPOINT = 480;
 
@@ -30,12 +22,9 @@ const HeaderBar = styled.View`
   border-bottom-color: ${({ theme }) => theme.colors.border};
 `;
 
-const Title = styled.Text`
-  color: ${({ theme }) => theme.colors.textPrimary};
-  font-size: 18px;
-  font-weight: 700;
-  flex-shrink: 1;
-  min-width: 0;
+const Logo = styled(Image)`
+  width: 140px;
+  height: 40px;
 `;
 
 const Profile = styled.View`
@@ -96,8 +85,14 @@ export default function Header() {
   return (
     <HeaderSafe edges={["top"]}>
       <HeaderBar>
-        <Title numberOfLines={1}>Psicólogos UI</Title>
-
+        <Logo
+          source={require("../assets/images/Logos/logo_con_nombre.png")}
+          resizeMode="contain"
+          style={{
+            width: compact ? 160 : 240,
+            height: compact ? 40 : 50,
+          }}
+        />
         <Profile>
           <ThemeToggle />
           <Avatar>
