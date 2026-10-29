@@ -30,6 +30,8 @@ export default function TurnoFilterPicker({
         selectedValue={apellido}
         onValueChange={(value) => setApellido(value)}
         style={styles.picker}
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Todos los apellidos" value="" />
         {letras.map((letra) => (
@@ -41,6 +43,8 @@ export default function TurnoFilterPicker({
         selectedValue={estado}
         onValueChange={(value) => setEstado(value)}
         style={styles.picker}
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Todos los estados" value="" />
         <Picker.Item label="Activo" value="activo" />
@@ -75,5 +79,6 @@ const makeStyles = (theme: DefaultTheme) =>
     },
     picker: {
       marginBottom: 8,
+      color: theme.colors.textPrimary,
     },
   });

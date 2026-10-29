@@ -90,6 +90,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
     <View style={styles.container}>
       <TextInput
         placeholder="Título"
+        placeholderTextColor={theme.colors.textDisabled}
         value={agenda.titulo}
         onChangeText={(text) => setAgenda({ ...agenda, titulo: text })}
         style={styles.input}
@@ -114,6 +115,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
 
       <TextInput
         placeholder="Descripción"
+        placeholderTextColor={theme.colors.textDisabled}
         value={agenda.descripcion}
         onChangeText={(text) => setAgenda({ ...agenda, descripcion: text })}
         style={styles.input}
@@ -124,6 +126,9 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
         onValueChange={(value) =>
           setAgenda({ ...agenda, psicologoId: Number(value) })
         }
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Seleccione psicólogo..." value={0} />
         {psicologos.map((p) => (
@@ -138,6 +143,9 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
       <Picker
         selectedValue={agenda.pacienteId}
         onValueChange={(value) => setAgenda({ ...agenda, pacienteId: value })}
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Seleccione paciente..." value="" />
         {pacientes.map((p) => (
@@ -154,6 +162,9 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
         onValueChange={(value) =>
           setAgenda({ ...agenda, consultorioId: value })
         }
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Seleccione consultorio..." value="" />
         {consultorio.map((c) => (

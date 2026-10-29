@@ -4,7 +4,7 @@ import * as ConsultorioService from "../services/ConsultorioService";
 
 export function useConsultorio() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [consultorio, setConsultorio] = useState<ConsultorioDto[]>([]);
 
   const fetchAll = async () => {
@@ -22,7 +22,7 @@ export function useConsultorio() {
     }
   };
 
-  const create = async (dto: ConsultorioDto) => {
+  const create = async (dto: Omit<ConsultorioDto, "consultorioId">) => {
     setLoading(true);
     setError(null);
 
@@ -48,13 +48,19 @@ export function useConsultorio() {
     }
   };
 
-  const update = async (id: string, dto: ConsultorioDto) => {
+  const update = async (id: number, dto: Omit<ConsultorioDto, "consultorioId">) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await ConsultorioService.update(id, dto);
-      setConsultorio((prev) => prev.map((c) => (c.Id === id ? response : c)));
-      return { success: true, data: response }; // <--- Retornamos éxito
+      await ConsultorioService.update(id, dto);
+      setConsultorio((prev) =>
+        prev.map((c) =>
+          c.consultorioId === id
+            ? { ...dto, consultorioId: id }
+            : c
+        ),
+      );
+      return { success: true };
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
@@ -73,12 +79,12 @@ export function useConsultorio() {
     }
   };
 
-  const remove = async (id: string) => {
+  const remove = async (id: number) => {
     setLoading(true);
     setError(null);
     try {
       await ConsultorioService.remove(id);
-      setConsultorio((prev) => prev.filter((c) => c.Id !== id));
+      setConsultorio((prev) => prev.filter((c) => c.consultorioId !== id));
       return { success: true };
     } catch (err: any) {
       const message = err.message || "Error al eliminar el consultorio";

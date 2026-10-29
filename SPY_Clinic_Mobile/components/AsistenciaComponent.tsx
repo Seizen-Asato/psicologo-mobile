@@ -8,17 +8,20 @@ import {
 } from "@/style/ui/Buttons";
 import React from "react";
 import { Text, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
 
 interface AsistenciaProps {
   turno: TurnoDto;
 }
 
 export default function AsistenciaComponent({ turno }: AsistenciaProps) {
+  const theme: DefaultTheme = useTheme();
   const { markAsistio, markAusente } = useTurno();
 
   return (
     <View style={{ marginTop: 8 }}>
-      <Text>Asistencia</Text>
+      <Text style={{ color: theme.colors.textPrimary }}>Asistencia</Text>
       <PrimaryButton onPress={() => markAsistio(turno.turnoId!)}>
         <PrimaryButtonLabel>Asistió</PrimaryButtonLabel>
       </PrimaryButton>

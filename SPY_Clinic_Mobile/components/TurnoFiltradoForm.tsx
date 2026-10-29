@@ -40,6 +40,7 @@ const TurnoFiltradoForm: React.FC<TurnoFiltradoFormProps> = ({
     <View style={styles.container}>
       <TextInput
         placeholder="Título"
+        placeholderTextColor={theme.colors.textDisabled}
         value={tituloFilter}
         onChangeText={setTituloFilter}
         style={styles.input}

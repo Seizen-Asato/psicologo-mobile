@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
 import { FechaPicker } from "./FechaHoraPicker";
 import {
   PrimaryButton,
@@ -28,6 +30,9 @@ export default function AgendaFormEdicion({
   onSave,
   onCancel,
 }: AgendaFormEdicionProps) {
+  const theme: DefaultTheme = useTheme();
+  const styles = makeStyles(theme);
+
   const [titulo, setTitulo] = useState(agendaInicial.titulo || "");
   const [descripcion, setDescripcion] = useState(
     agendaInicial.descripcion || "",
@@ -72,14 +77,31 @@ export default function AgendaFormEdicion({
   );
 }
 
-const styles = StyleSheet.create({
-  container: { padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-  label: { fontWeight: "bold", marginTop: 10 },
-  input: {
-    borderWidth: 1,
-    borderColor:
-      "#ccc`, padding: 8, marginTop: 4, borderRadius: 6, backgroundColor: #fff",
-  },
-  buttons: { marginTop: 30, gap: 12 },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      padding: 20,
+      backgroundColor: theme.colors.background,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      marginBottom: 20,
+      color: theme.colors.textPrimary,
+    },
+    label: {
+      fontWeight: "bold",
+      marginTop: 10,
+      color: theme.colors.textPrimary,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      padding: 8,
+      marginTop: 4,
+      borderRadius: 6,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+    },
+    buttons: { marginTop: 30, gap: 12 },
+  });

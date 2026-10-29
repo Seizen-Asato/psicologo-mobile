@@ -54,18 +54,21 @@ export default function RegisterScreen() {
       <TextInput
         style={styles.input}
         placeholder="Nombre"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.name}
         onChangeText={(text) => handleChange("name", text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Apellido"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.lastName}
         onChangeText={(text) => handleChange("lastName", text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="email-address"
         autoCapitalize="none"
         value={form.email}
@@ -74,6 +77,7 @@ export default function RegisterScreen() {
       <TextInput
         style={styles.input}
         placeholder="Contraseña"
+        placeholderTextColor={theme.colors.textDisabled}
         secureTextEntry
         value={form.password}
         onChangeText={(text) => handleChange("password", text)}
@@ -81,6 +85,7 @@ export default function RegisterScreen() {
       <TextInput
         style={styles.input}
         placeholder="Consultorio"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.consultorio ?? ""}
         onChangeText={(text) => handleChange("consultorio", text)}
       />

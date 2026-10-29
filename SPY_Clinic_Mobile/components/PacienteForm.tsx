@@ -45,6 +45,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={Nombre}
         onChangeText={setNombre}
         placeholder="Ingrese nombre"
+        placeholderTextColor={theme.colors.textDisabled}
       />
 
       <Text style={styles.label}>Apellido</Text>
@@ -53,6 +54,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={Apellido}
         onChangeText={setApellido}
         placeholder="Ingrese apellido"
+        placeholderTextColor={theme.colors.textDisabled}
       />
 
       <Text style={styles.label}>DNI</Text>
@@ -61,6 +63,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={Dni}
         onChangeText={setDni}
         placeholder="Ingrese DNI"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="numeric"
       />
 
@@ -70,6 +73,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={Telefono}
         onChangeText={setTelefono}
         placeholder="Ingrese teléfono"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="phone-pad"
       />
 
@@ -79,6 +83,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={Mail}
         onChangeText={setMail}
         placeholder="Ingrese correo electrónico"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="email-address"
       />
 
@@ -88,6 +93,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={fechaNacimiento.toISOString().split("T")[0]}
         onChangeText={(text) => setFechaNacimiento(new Date(text))}
         placeholder="YYYY-MM-DD"
+        placeholderTextColor={theme.colors.textDisabled}
       />
 
       <PrimaryButton

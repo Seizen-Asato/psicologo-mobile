@@ -55,24 +55,28 @@ export default function PsicologoForm() {
       <TextInput
         style={styles.input}
         placeholder="Nombre"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.nombre}
         onChangeText={(text) => setForm({ ...form, nombre: text })}
       />
       <TextInput
         style={styles.input}
         placeholder="Apellido"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.apellido}
         onChangeText={(text) => setForm({ ...form, apellido: text })}
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.email}
         onChangeText={(text) => setForm({ ...form, email: text })}
       />
       <TextInput
         style={styles.input}
         placeholder="Teléfono"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.telefono}
         onChangeText={(text) => setForm({ ...form, telefono: text })}
       />
