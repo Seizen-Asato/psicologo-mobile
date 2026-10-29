@@ -23,7 +23,10 @@ export async function fetchApi(url, options = {}) {
       );
     }
 
-    return await response.json();
+    // PUT/DELETE suelen responder 204 No Content (sin cuerpo): no hacer json()
+    const responseText = await response.text();
+    if (!responseText) return null;
+    return JSON.parse(responseText);
   } catch (error) {
     const message = error?.message?.includes("Network request failed")
       ? `No se pudo conectar a ${url} — verificá que la API esté corriendo y que services/baseUrl.js apunte a la IP correcta de la PC.`

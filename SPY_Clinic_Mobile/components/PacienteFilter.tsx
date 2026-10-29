@@ -20,6 +20,7 @@ const PacienteFilter: React.FC<PacienteFilterProps> = ({
       <TextInput
         style={styles.input}
         placeholder="Buscar paciente por nombre..."
+        placeholderTextColor={theme.colors.textDisabled}
         value={filter}
         onChangeText={onFilterChange}
       />

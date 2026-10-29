@@ -2,29 +2,51 @@ import { ConsultorioDto } from "@/models/Consultorio";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import {
-  Button,
+  Alert,
   FlatList,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+
+import {
+  DangerButton,
+  DangerButtonLabel,
+  PrimaryButton,
+  PrimaryButtonLabel,
+  SecondaryButton,
+  SecondaryButtonLabel,
+} from "../style/ui/Buttons";
 
 import { useConsultorio } from "../hooks/useConsultorio";
+
+// Tipo local para los campos de texto del form (todo como string)
+interface ConsultorioFormState {
+  consultorioId: number;
+  nombre: string;
+  calle: string;
+  numero: string;
+  tipoModalidadNombre: string;
+}
+
+const emptyForm: ConsultorioFormState = {
+  consultorioId: 0,
+  nombre: "",
+  calle: "",
+  numero: "",
+  tipoModalidadNombre: "",
+};
 
 export default function ConsultorioForm() {
   const { consultorio, fetchAll, create, update, remove, loading, error } =
     useConsultorio();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
-  const [form, setForm] = useState({
-    Id: "",
-    nombre: "",
-    calle: "",
-    numero: "",
-    presencial: false,
-    virtual: false,
-    tipoModalidadNombre: "",
-  });
+  const [form, setForm] = useState<ConsultorioFormState>(emptyForm);
 
   const [isEditing, setIsEditing] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -63,19 +85,19 @@ export default function ConsultorioForm() {
       return;
     }
 
-    const payload: ConsultorioDto = {
-      Id: form.Id,
-      Nombre: form.nombre.trim(),
-      Calle: form.calle.trim() === "" ? null : form.calle.trim(),
-      Numero: form.numero === "" ? null : Number(form.numero),
-      TipoModalidadId: null,
-      TipoModalidadNombre: form.tipoModalidadNombre.trim(),
+    // Payload con la misma estructura que espera la API (camelCase)
+    const payload = {
+      nombre: form.nombre.trim(),
+      calle: form.calle.trim() === "" ? null : form.calle.trim(),
+      numero: form.numero === "" ? null : Number(form.numero),
+      tipoModalidadId: null,
+      tipoModalidadNombre: form.tipoModalidadNombre.trim(),
     };
 
     if (isEditing) {
       // Lógica de Actualizar
-      const result = await update(form.Id, payload);
-      if (result?.success !== false) {
+      const result = await update(form.consultorioId, payload);
+      if (result?.success) {
         setSuccessMsg("¡Consultorio actualizado con éxito!");
         resetForm();
         fetchAll();
@@ -85,7 +107,7 @@ export default function ConsultorioForm() {
     } else {
       // Lógica de Crear
       const result = await create(payload);
-      if (result?.success !== false) {
+      if (result?.success) {
         setSuccessMsg("¡Consultorio creado con éxito!");
         resetForm();
         fetchAll();
@@ -95,16 +117,16 @@ export default function ConsultorioForm() {
     }
   };
 
+  // Mapea los datos del consultorio seleccionado al formulario.
+  // Trim: evita arrastrar espacios de columnas char de la BD al input.
   const handleEditPress = (item: ConsultorioDto) => {
     setIsEditing(true);
     setForm({
-      Id: item.Id,
-      nombre: item.Nombre || "",
-      calle: item.Calle || "",
-      numero: item.Numero ? String(item.Numero) : "",
-      presencial: false,
-      virtual: false,
-      tipoModalidadNombre: item.TipoModalidadNombre || "",
+      consultorioId: item.consultorioId,
+      nombre: (item.nombre ?? "").trim(),
+      calle: (item.calle ?? "").trim(),
+      numero: item.numero != null ? String(item.numero) : "",
+      tipoModalidadNombre: (item.tipoModalidadNombre ?? "").trim(),
     });
     setFormError(null);
     setSuccessMsg(null);
@@ -112,60 +134,99 @@ export default function ConsultorioForm() {
 
   const resetForm = () => {
     setIsEditing(false);
-    setForm({
-      Id: "",
-      nombre: "",
-      calle: "",
-      numero: "",
-      presencial: false,
-      virtual: false,
-      tipoModalidadNombre: "",
-    });
+    setForm(emptyForm);
+  };
+
+  // Confirma y ejecuta el DELETE del consultorio
+  const handleDeletePress = (item: ConsultorioDto) => {
+    Alert.alert(
+      "Eliminar consultorio",
+      `¿Seguro que querés eliminar "${item.nombre ?? "este consultorio"}"?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            setSuccessMsg(null);
+            setFormError(null);
+            // Si estamos editando este consultorio, cancelamos la edición
+            if (isEditing && form.consultorioId === item.consultorioId) {
+              resetForm();
+            }
+            const result = await remove(item.consultorioId);
+            if (result?.success) {
+              setSuccessMsg("Consultorio eliminado con éxito");
+            } else {
+              setFormError(
+                result?.error ||
+                  "No se pudo eliminar el consultorio. Si tiene agendas asociadas no se puede eliminar.",
+              );
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   const renderConsultorio = ({ item }: { item: ConsultorioDto }) => (
     <View style={styles.card}>
-      <Text style={styles.title}>{item.Nombre}</Text>
-      <Text>
-        {item.Calle} {item.Numero}
+      <Text style={styles.cardTitle}>{(item.nombre ?? "").trim()}</Text>
+      <Text style={styles.cardText}>
+        {(item.calle ?? "").trim()
+          ? `${(item.calle ?? "").trim()} ${item.numero ?? ""}`
+          : "Sin dirección presencial"}
       </Text>
-      <Text>Modalidad: {item.TipoModalidadNombre}</Text>
+      <Text style={styles.cardText}>
+        Modalidad: {(item.tipoModalidadNombre ?? "").trim() || "—"}
+      </Text>
       <View style={styles.actions}>
-        <Button title="Editar" onPress={() => handleEditPress(item)} />
-        <Button title="Eliminar" color="red" onPress={() => remove(item.Id)} />
+        <View style={styles.actionBtn}>
+          <SecondaryButton onPress={() => handleEditPress(item)}>
+            <SecondaryButtonLabel>Editar</SecondaryButtonLabel>
+          </SecondaryButton>
+        </View>
+        <View style={styles.actionBtn}>
+          <DangerButton onPress={() => handleDeletePress(item)}>
+            <DangerButtonLabel>Eliminar</DangerButtonLabel>
+          </DangerButton>
+        </View>
       </View>
     </View>
   );
 
-  return (
-    <View style={styles.container}>
+  const listHeader = (
+    <View>
       <Text style={styles.heading}>
         {isEditing ? "Editar Consultorio" : "Nuevo Consultorio"}
       </Text>
 
-      <Text>Nombre</Text>
+      <Text style={styles.label}>Nombre</Text>
       <Text
         style={styles.subtext}
       >{`Ingrese el nombre del consultorio o puede poner "Consultorio de (su nombre)"`}</Text>
       <TextInput
         style={styles.input}
         placeholder="Nombre"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.nombre}
         onChangeText={(text) => setForm({ ...form, nombre: text })}
       />
 
-      <Text>Calle</Text>
+      <Text style={styles.label}>Calle</Text>
       <Text style={styles.subtext}>
         Solo si su consultorio tiene dirección presencial
       </Text>
       <TextInput
         style={styles.input}
         placeholder="Calle"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.calle}
         onChangeText={(text) => setForm({ ...form, calle: text })}
       />
 
-      <Text>Número</Text>
+      <Text style={styles.label}>Número</Text>
       <Text style={styles.subtext}>
         Solo si su consultorio tiene dirección presencial
       </Text>
@@ -173,17 +234,21 @@ export default function ConsultorioForm() {
         style={styles.input}
         placeholder="Número"
         keyboardType="numeric"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.numero}
         onChangeText={(text) => setForm({ ...form, numero: text })}
       />
 
       <View style={styles.inputGroup}>
-        <Text>Tipo de modalidad</Text>
+        <Text style={styles.label}>Tipo de modalidad</Text>
         <Picker
           selectedValue={form.tipoModalidadNombre}
           onValueChange={(value) =>
             setForm({ ...form, tipoModalidadNombre: value })
           }
+          dropdownIconColor={theme.colors.textSecondary}
+          itemStyle={{ color: theme.colors.textPrimary }}
+          style={{ color: theme.colors.textPrimary }}
         >
           <Picker.Item label="Seleccioná una modalidad" value="" />
           <Picker.Item label="Presencial" value="Presencial" />
@@ -191,67 +256,104 @@ export default function ConsultorioForm() {
         </Picker>
       </View>
 
-      <Button
-        title={
-          loading
+      <PrimaryButton onPress={handleSubmit} disabled={loading}>
+        <PrimaryButtonLabel>
+          {loading
             ? "Guardando..."
             : isEditing
               ? "Actualizar Consultorio"
-              : "Crear Consultorio"
-        }
-        onPress={handleSubmit}
-        disabled={loading}
-      />
+              : "Crear Consultorio"}
+        </PrimaryButtonLabel>
+      </PrimaryButton>
 
       {isEditing && (
         <View style={{ marginTop: 10 }}>
-          <Button title="Cancelar Edición" color="gray" onPress={resetForm} />
+          <SecondaryButton onPress={resetForm} disabled={loading}>
+            <SecondaryButtonLabel>Cancelar Edición</SecondaryButtonLabel>
+          </SecondaryButton>
         </View>
       )}
 
       {formError && <Text style={styles.error}>{formError}</Text>}
       {successMsg && <Text style={styles.success}>{successMsg}</Text>}
-      {error && <Text style={styles.error}>Error: {String(error)}</Text>}
+      {error && <Text style={styles.error}>Error: {error}</Text>}
 
       <Text style={[styles.heading, { marginTop: 20 }]}>
         Consultorios Registrados
       </Text>
-      <FlatList
-        data={consultorio}
-        keyExtractor={(item) => String(item.Id)}
-        renderItem={renderConsultorio}
-      />
     </View>
+  );
+
+  // Un único contenedor de scroll: el form va como header del FlatList, así
+  // la pantalla entera (form + lista) scrollea con la misma barra.
+  return (
+    <FlatList
+      style={styles.container}
+      data={consultorio}
+      keyExtractor={(item) => String(item.consultorioId)}
+      renderItem={renderConsultorio}
+      ListHeaderComponent={listHeader}
+      ListEmptyComponent={
+        <Text style={styles.subtext}>No hay consultorios registrados.</Text>
+      }
+      contentContainerStyle={{ paddingBottom: 24 }}
+      showsVerticalScrollIndicator={true}
+    />
   );
 }
 
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  heading: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  subtext: { fontSize: 12, color: "#666", marginBottom: 4 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 8,
-    marginBottom: 10,
-    borderRadius: 6,
-  },
-  inputGroup: {
-    marginBottom: 12,
-  },
-  card: {
-    borderWidth: globalThis ? 1 : 1, // o 1
-    borderColor: "#ccc",
-    padding: 12,
-    marginBottom: 10,
-    borderRadius: 6,
-  },
-  title: { fontWeight: "bold" },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 10,
-  },
-  error: { color: "red", marginTop: 8 },
-  success: { color: "green", marginTop: 8 },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: { flex: 1 },
+    heading: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 10,
+      color: theme.colors.textPrimary,
+    },
+    label: { color: theme.colors.textPrimary, marginBottom: 2 },
+    subtext: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginBottom: 4,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+      padding: 8,
+      marginBottom: 10,
+      borderRadius: theme.radius.small,
+      minHeight: theme.touchMin,
+    },
+    inputGroup: {
+      marginBottom: 12,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.small,
+      overflow: "hidden",
+    },
+    card: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
+      padding: 12,
+      marginBottom: 10,
+      borderRadius: theme.radius.small,
+    },
+    cardTitle: {
+      fontWeight: "bold",
+      fontSize: 16,
+      color: theme.colors.textPrimary,
+    },
+    cardText: { color: theme.colors.textSecondary },
+    actions: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginTop: 10,
+      gap: 12,
+    },
+    actionBtn: { flex: 1 },
+    error: { color: theme.colors.error, marginTop: 8 },
+    success: { color: theme.colors.success, marginTop: 8 },
+  });

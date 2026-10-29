@@ -44,3 +44,9 @@ export const PrimaryButtonLabel = styled(BaseLabel)`
 export const SecondaryButtonLabel = styled(BaseLabel)`
   color: ${({ theme }) => theme.colors.textPrimary};
 `;
+
+// El peligro lo marca el borde/error del botón; el texto queda primario
+// porque el design-system prohíbe texto pequeño en rojo sobre surface (§1.4).
+export const DangerButtonLabel = styled(BaseLabel)`
+  color: ${({ theme }) => theme.colors.textPrimary};
+`;

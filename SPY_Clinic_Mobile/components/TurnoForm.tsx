@@ -115,6 +115,9 @@ export default function TurnoForm({
         onValueChange={(val: TurnoDto["estado"]) =>
           setTurno({ ...turno, estado: val })
         }
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Pendiente" value="pendiente" />
         <Picker.Item label="Confirmado" value="confirmado" />
@@ -124,6 +127,7 @@ export default function TurnoForm({
       <TextInput
         style={styles.input}
         placeholder="Duración (minutos)"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="numeric"
         value={String(turno.minutos)}
         onChangeText={(val) =>
@@ -136,6 +140,11 @@ export default function TurnoForm({
         <Switch
           value={turno.modalidadVirtual}
           onValueChange={(val) => setTurno({ ...turno, modalidadVirtual: val })}
+          trackColor={{
+            false: theme.colors.borderInput,
+            true: theme.colors.actionPrimary,
+          }}
+          thumbColor={theme.colors.onAction}
         />
       </View>
 
@@ -143,6 +152,7 @@ export default function TurnoForm({
         <TextInput
           style={styles.input}
           placeholder="URL de sesión"
+          placeholderTextColor={theme.colors.textDisabled}
           value={turno.url ?? ""}
           onChangeText={(text) => setTurno({ ...turno, url: text })}
         />
@@ -153,6 +163,7 @@ export default function TurnoForm({
       <TextInput
         style={styles.input}
         placeholder="Cantidad de turnos"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="numeric"
         value={String(turno.cantidadTurnos)}
         onChangeText={(val) =>
@@ -166,6 +177,9 @@ export default function TurnoForm({
         onValueChange={(value) =>
           setTurno({ ...turno, psicologoId: Number(value) })
         }
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Seleccione..." value="" />
         {psicologos.map((p) => (
@@ -183,6 +197,9 @@ export default function TurnoForm({
         onValueChange={(value) =>
           setTurno({ ...turno, pacienteId: Number(value) })
         }
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Seleccione..." value="" />
         {pacientes.map((p) => (
@@ -200,6 +217,9 @@ export default function TurnoForm({
         onValueChange={(value) =>
           setTurno({ ...turno, planTurnoId: Number(value) })
         }
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
       >
         <Picker.Item label="Seleccione..." value="" />
         {planes.map((pl) => (
@@ -214,6 +234,7 @@ export default function TurnoForm({
       <TextInput
         style={[styles.input, { height: 80 }]}
         placeholder="Descripción"
+        placeholderTextColor={theme.colors.textDisabled}
         multiline
         value={turno.descripcion}
         onChangeText={(text) => setTurno({ ...turno, descripcion: text })}

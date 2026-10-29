@@ -5,6 +5,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
+import { LightColors } from "../style/layout/Colorors";
+import { useColorMode } from "../context/Theme";
 import type { CalendarEvent } from "../utils/CalendarEvents";
 import { toCalendarEvents } from "../utils/CalendarEvents";
 import {
@@ -29,6 +31,39 @@ const CalendarView: React.FC<
   const [error, setError] = useState<string | null>(null);
   const theme = useTheme();
   const styles = makeStyles(theme);
+
+  // useColorMode es la única fuente de verdad del modo (preferencia guardada o sistema).
+  const { isDark } = useColorMode();
+
+  // Tema del Calendar de react-native-big-calendar a partir de los tokens del app.
+  // gray.200 dibuja las líneas de la grilla; gray.800 los textos de día/hora.
+  // En light los bordes usan grises reales (tokens light) para que la grilla
+  // se note sobre el fondo; en dark se usa la paleta oscura.
+  const calendarTheme = {
+    palette: {
+      primary: {
+        main: theme.colors.actionPrimary,
+        contrastText: theme.colors.onAction,
+      },
+      nowIndicator: theme.colors.actionSecondary,
+      gray: isDark
+        ? {
+            100: theme.colors.surface,
+            200: theme.colors.border,
+            300: theme.colors.border,
+            500: theme.colors.textSecondary,
+            800: theme.colors.textPrimary,
+          }
+        : {
+            100: LightColors.border,
+            200: LightColors.borderInput,
+            300: LightColors.borderInput,
+            500: LightColors.textDisabled,
+            800: LightColors.textPrimary,
+          },
+      moreLabel: theme.colors.textPrimary,
+    },
+  };
 
   const handleFilter = async (filters: { date?: string; titulo?: string }) => {
     try {
@@ -116,6 +151,7 @@ const CalendarView: React.FC<
         height={600}
         mode={mode}
         date={currentDate}
+        theme={calendarTheme}
         onPressEvent={(event: CalendarEvent) =>
           onSelectAgenda(event.resource)
         }

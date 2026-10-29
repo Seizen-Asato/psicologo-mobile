@@ -332,6 +332,8 @@ export default function PlanTurnoScreen() {
                     null,
                 })
               }
+              dropdownIconColor={theme.colors.textSecondary}
+              itemStyle={{ color: theme.colors.textPrimary }}
             >
               <Picker.Item label="Seleccione un paciente..." value="" />
               {pacientes.map((p) => (
@@ -377,6 +379,7 @@ export default function PlanTurnoScreen() {
             <TextInput
               style={styles.input}
               placeholder="1"
+              placeholderTextColor={theme.colors.textDisabled}
               keyboardType="numeric"
               value={form.cantidadTurno}
               onChangeText={(text) => setForm({ ...form, cantidadTurno: text })}
