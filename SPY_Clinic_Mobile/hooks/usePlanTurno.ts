@@ -2,10 +2,8 @@ import {
   create,
   getAll,
   remove,
-  type CreatePlanTurnoPayload,
-  type PlanTurno,
-  type ServiceResult,
 } from "@/services/PlanTurnoService";
+import { type CreatePlanTurnoPayload, type PlanTurno, type ServiceResult } from "@/models/PlanTurnoDto";
 import { useCallback, useEffect, useState } from "react";
 
 export function usePlanTurno() {

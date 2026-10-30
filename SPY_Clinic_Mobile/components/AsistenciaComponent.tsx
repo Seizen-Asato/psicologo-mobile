@@ -1,4 +1,3 @@
-import { useTurno } from "@/hooks/useTurno";
 import { TurnoDto } from "@/models/TurnoDto";
 import {
   DangerButton,
@@ -13,19 +12,24 @@ import { useTheme } from "styled-components/native";
 
 interface AsistenciaProps {
   turno: TurnoDto;
+  onAsistio: (id: string) => Promise<{ success: boolean }>;
+  onAusente: (id: string) => Promise<{ success: boolean }>;
 }
 
-export default function AsistenciaComponent({ turno }: AsistenciaProps) {
+export default function AsistenciaComponent({
+  turno,
+  onAsistio,
+  onAusente,
+}: AsistenciaProps) {
   const theme: DefaultTheme = useTheme();
-  const { markAsistio, markAusente } = useTurno();
 
   return (
     <View style={{ marginTop: 8 }}>
       <Text style={{ color: theme.colors.textPrimary }}>Asistencia</Text>
-      <PrimaryButton onPress={() => markAsistio(turno.turnoId!)}>
+      <PrimaryButton onPress={() => onAsistio(turno.turnoId!)}>
         <PrimaryButtonLabel>Asistió</PrimaryButtonLabel>
       </PrimaryButton>
-      <DangerButton onPress={() => markAusente(turno.turnoId!)}>
+      <DangerButton onPress={() => onAusente(turno.turnoId!)}>
         <SecondaryButtonLabel>No asistió</SecondaryButtonLabel>
       </DangerButton>
     </View>
