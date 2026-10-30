@@ -15,9 +15,17 @@ interface TurnoCardProps {
   turno: TurnoDto;
   onEdit: (turno: TurnoDto) => void;
   onRemove: (id: string) => void;
+  onAsistio?: (id: string) => Promise<{ success: boolean }>;
+  onAusente?: (id: string) => Promise<{ success: boolean }>;
 }
 
-export function TurnoCard({ turno, onEdit, onRemove }: TurnoCardProps) {
+export function TurnoCard({
+  turno,
+  onEdit,
+  onRemove,
+  onAsistio,
+  onAusente,
+}: TurnoCardProps) {
   const theme = useTheme();
   const styles = makeStyles(theme);
   const cardRef = useRef<View>(null);
@@ -39,7 +47,13 @@ export function TurnoCard({ turno, onEdit, onRemove }: TurnoCardProps) {
         <Text style={styles.detail}>Sesión virtual: {turno.url}</Text>
       )}
 
-      <AsistenciaComponent turno={turno} />
+      {(onAsistio || onAusente) && (
+        <AsistenciaComponent
+          turno={turno}
+          onAsistio={onAsistio ?? (async () => ({ success: false }))}
+          onAusente={onAusente ?? (async () => ({ success: false }))}
+        />
+      )}
 
       <View style={styles.actions}>
         <SecondaryButton

@@ -23,6 +23,8 @@ export default function TurnoAllScreen() {
     fetchTurnosALL,
     removeTurno,
     filterTurnos,
+    markAsistio,
+    markAusente,
     apellido,
     estado,
     setEstado,
@@ -78,6 +80,8 @@ export default function TurnoAllScreen() {
               await removeTurno(id);
               await fetchTurnosALL();
             }}
+            onAsistio={markAsistio}
+            onAusente={markAusente}
           />
         )}
         ListEmptyComponent={

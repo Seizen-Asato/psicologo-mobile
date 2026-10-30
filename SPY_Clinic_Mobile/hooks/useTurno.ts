@@ -38,7 +38,12 @@ export function useTurno() {
   };
 
   const fetchTurnoById = async (id: number) => {
-    return await turnosService.getById(id);
+    const turno = await turnosService.getById(id);
+    // El backend serializa hora como "HH:mm:ss"; el formulario usa "HH:mm".
+    if (turno && typeof turno.hora === "string") {
+      return { ...turno, hora: turno.hora.slice(0, 5) };
+    }
+    return turno;
   };
 
   const validateTurno = (turno: TurnoDto) => {
@@ -102,10 +107,14 @@ export function useTurno() {
       setLoading(false);
     }
   };
+  // Las respuestas PUT pueden ser 204 (fetchApi devuelve null): actualizamos
+  // solo el campo 'asistencia' del turno sobre el estado local.
   const markAsistio = async (id: string) => {
     try {
-      const updated = await turnosService.update(id, { asistencia: true });
-      setTurnos((prev) => prev.map((t) => (t.turnoId === id ? updated : t)));
+      await turnosService.update(id, { asistencia: true });
+      setTurnos((prev) =>
+        prev.map((t) => (t.turnoId === id ? { ...t, asistencia: true } : t)),
+      );
       return { success: true };
     } catch (err: any) {
       return {
@@ -117,8 +126,10 @@ export function useTurno() {
 
   const markAusente = async (id: string) => {
     try {
-      const updated = await turnosService.update(id, { asistencia: false });
-      setTurnos((prev) => prev.map((t) => (t.turnoId === id ? updated : t)));
+      await turnosService.update(id, { asistencia: false });
+      setTurnos((prev) =>
+        prev.map((t) => (t.turnoId === id ? { ...t, asistencia: false } : t)),
+      );
       return { success: true };
     } catch (err: any) {
       return {

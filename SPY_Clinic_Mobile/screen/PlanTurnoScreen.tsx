@@ -2,7 +2,7 @@ import { usePlanTurno } from "@/hooks/usePlanTurno";
 import {
   type CreatePlanTurnoPayload,
   type PlanTurno,
-} from "@/services/PlanTurnoService";
+} from "@/models/PlanTurnoDto";
 import DateTimePicker, {
   type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
