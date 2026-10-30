@@ -50,8 +50,6 @@ export function usePaciente({
     },
   });
 
-  //logic of removePaciente
-
   const removePacienteMutation = useMutation({
     mutationFn: (pacienteId: number) => remove(pacienteId),
     onSuccess: (_, pacienteId) => {

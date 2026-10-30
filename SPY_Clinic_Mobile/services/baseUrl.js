@@ -1,8 +1,6 @@
 import * as Device from "expo-device";
 import { Platform } from "react-native";
 
-// ⚠️ Actualizar cuando cambie la IP de la PC.
-// Verificar con: ipconfig (buscar "Dirección IPv4" del adaptador activo)
 const LAN_IP = "192.168.100.36";
 const PORT = "5008";
 

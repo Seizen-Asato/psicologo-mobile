@@ -1,20 +1,12 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
 
-// design-system.md §1.2/1.3 + Expo v54 safe-area-context.
-// Mobile-first: sin anchos fijos, táctil mínimo 44px (§1.4).
-
 export const LoginSafeArea = styled(SafeAreaView)`
   flex: 1;
   position: relative;
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-// Toggle de tema: fijo en la esquina superior derecha, fuera del ScrollView
-// para que siga siendo alcanzable con el teclado abierto.
-// `$top` lleva el inset del safe area: los hijos absolutos se posicionan
-// respecto al padding box, sin el inset el toggle caería bajo la barra de
-// estado. Prop transitoria: no se propaga al View nativo.
 export const LoginThemeToggle = styled.View<{ $top: number }>`
   position: absolute;
   top: ${({ $top }) => $top}px;

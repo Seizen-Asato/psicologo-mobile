@@ -9,7 +9,6 @@ import { SecondaryButton, SecondaryButtonLabel } from "../style/ui/Buttons";
 
 const screenWidth = Dimensions.get("window").width;
 
-/** Convierte un hex de _layout/Colorors a rgba para react-native-chart-kit. */
 const hexToRgba = (hex: string, opacity: number) => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -138,8 +137,7 @@ export default function DashboardScreen() {
         width={screenWidth - 40}
         height={220}
         chartConfig={{
-          color: (opacity = 1) =>
-            hexToRgba(theme.colors.textPrimary, opacity),
+          color: (opacity = 1) => hexToRgba(theme.colors.textPrimary, opacity),
           labelColor: (opacity = 1) =>
             hexToRgba(theme.colors.textPrimary, opacity),
         }}

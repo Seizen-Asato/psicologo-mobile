@@ -18,7 +18,6 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
 const FECHA_RE = /^\d{4}-\d{2}-\d{2}/;
 const HORA_RE = /^(\d{1,2}):(\d{2})/;
 
-/** "YYYY-MM-DD" (o ISO con hora) -> "dd/mm/yyyy". */
 export function fechaAMostrar(valor: string) {
   const iso = (valor ?? "").slice(0, 10);
   if (!FECHA_RE.test(iso)) return "";
@@ -26,14 +25,12 @@ export function fechaAMostrar(valor: string) {
   return `${d}/${m}/${y}`;
 }
 
-/** "HH:mm" o "HH:mm:ss" -> "HH:mm". */
 export function horaAMostrar(valor: string) {
   const m = HORA_RE.exec(valor ?? "");
   if (!m) return "";
   return `${pad2(Number(m[1]))}:${m[2]}`;
 }
 
-/** "YYYY-MM-DD..." -> Date local (evita el desfase de zona al usar new Date(iso)). */
 function fechaValorADate(valor: string) {
   const iso = (valor ?? "").slice(0, 10);
   if (!FECHA_RE.test(iso)) return new Date();
@@ -41,7 +38,6 @@ function fechaValorADate(valor: string) {
   return new Date(y, m - 1, d);
 }
 
-/** "HH:mm[:ss]" -> Date local (la parte de fecha es irrelevante en modo "time"). */
 function horaValorADate(valor: string) {
   const m = HORA_RE.exec(valor ?? "");
   if (!m) return new Date();
@@ -54,16 +50,11 @@ interface PickerFieldProps {
 }
 
 export interface FechaPickerProps extends PickerFieldProps {
-  /** Valor del formulario: "YYYY-MM-DD" (tolera también "YYYY-MM-DDTHH:mm..."). */
   value: string;
-  /** Devuelve la fecha elegida como "YYYY-MM-DD". */
+
   onChange: (fecha: string) => void;
 }
 
-/**
- * Campo de solo fecha con el patrón amigable de PlanTurno:
- * un Pressable con look de input que abre el DateTimePicker nativo (modo date).
- */
 export function FechaPicker({
   value,
   onChange,
@@ -74,11 +65,9 @@ export function FechaPicker({
   const styles = makeStyles(theme);
   const [abierto, setAbierto] = useState(false);
 
-  // Toggle: en iOS el picker queda montado y se cierra volviendo a tocar el campo.
   const alternar = () => setAbierto((v) => !v);
 
   const confirmar = (event: DateTimePickerEvent, date?: Date) => {
-    // En Android el diálogo nativo se cierra solo: desmonto el picker.
     if (Platform.OS === "android") setAbierto(false);
 
     if (event.type === "dismissed" || !date) return;
@@ -116,16 +105,11 @@ export function FechaPicker({
 }
 
 export interface HoraPickerProps extends PickerFieldProps {
-  /** Valor del formulario: "HH:mm" o "HH:mm:ss". */
   value: string;
-  /** Devuelve la hora elegida como "HH:mm" (24 hs). */
+
   onChange: (hora: string) => void;
 }
 
-/**
- * Campo de solo hora con el patrón amigable de PlanTurno:
- * un Pressable con look de input que abre el DateTimePicker nativo (modo time).
- */
 export function HoraPicker({
   value,
   onChange,

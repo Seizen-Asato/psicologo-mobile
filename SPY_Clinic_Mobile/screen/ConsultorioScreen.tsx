@@ -5,8 +5,6 @@ import { useTheme } from "styled-components/native";
 
 import ConsultorioForm from "../components/ConsultorioForm";
 
-// Misma convención que PsicologoScreen: useTheme + makeStyles(theme) para que
-// el fondo y los textos reaccionen al ThemeToggle del Header (dark/light).
 export default function ConsultorioScreen() {
   const theme = useTheme();
   const styles = makeStyles(theme);

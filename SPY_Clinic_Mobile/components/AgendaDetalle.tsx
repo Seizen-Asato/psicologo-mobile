@@ -1,4 +1,3 @@
-// components/AgendaDetalle.tsx
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import type { DefaultTheme } from "styled-components";

@@ -1,5 +1,3 @@
-//aun no se implemento, post examenes se implementara el registro
-
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {

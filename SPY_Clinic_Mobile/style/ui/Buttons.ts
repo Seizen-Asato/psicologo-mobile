@@ -1,11 +1,6 @@
 import styled from "styled-components/native";
 import { FontFamily } from "../layout/Typography";
 
-// design-system.md §1.4 — Primario: fondo brand + texto ink (#121418)
-// (light 5.91:1 / dark 9.08:1). Secundario/peligro: fondo surface +
-// borde + texto primario; nunca texto pequeño en lima/ámbar/rojo sobre
-// superficie. Táctil mínimo 44px en todos.
-
 const BaseButton = styled.Pressable`
   min-height: 44px;
   padding: 12px 16px;
@@ -45,8 +40,6 @@ export const SecondaryButtonLabel = styled(BaseLabel)`
   color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
-// El peligro lo marca el borde/error del botón; el texto queda primario
-// porque el design-system prohíbe texto pequeño en rojo sobre surface (§1.4).
 export const DangerButtonLabel = styled(BaseLabel)`
   color: ${({ theme }) => theme.colors.textPrimary};
 `;

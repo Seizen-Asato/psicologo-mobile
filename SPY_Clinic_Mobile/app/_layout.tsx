@@ -35,7 +35,6 @@ export default function Layout() {
   const scheme = useColorScheme();
   const { preference, hydrate, hydrated } = useThemeStore();
 
-  // Preferencia del usuario si existe; si no, el ajuste del sistema.
   const isDark =
     (preference ?? (scheme === "dark" ? "dark" : "light")) === "dark";
   const theme = isDark ? darkTheme : lightTheme;
@@ -45,8 +44,6 @@ export default function Layout() {
   }, [hydrate]);
 
   useEffect(() => {
-    // El splash espera también al tema: sin esto la app abre con el tema del
-    // sistema y salta al guardado (destello).
     if (fontsLoaded && hydrated) {
       SplashScreen.hideAsync();
     }

@@ -1,4 +1,3 @@
-// app/AgendaDetalle.tsx
 import AgendaDetalleComponent from "@/components/AgendaDetalle";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";

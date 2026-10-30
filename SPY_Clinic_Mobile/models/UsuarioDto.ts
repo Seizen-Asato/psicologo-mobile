@@ -6,5 +6,4 @@ export interface UsuarioDto {
   password?: string;
   consultorio?: string;
   rol?: string;
-  //agregar al backend para habilitarlos a rol y consultorio
 }

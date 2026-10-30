@@ -47,7 +47,6 @@ export function useAgenda() {
     },
   });
 
-  // 🔹 Filtrar por fecha
   const getAgendaByDate = async (date: string) => {
     const response = await getByDate(date);
     return Array.isArray(response) ? response : (response?.data ?? []);

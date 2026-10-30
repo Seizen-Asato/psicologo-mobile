@@ -1,8 +1,5 @@
 import { Platform, StyleSheet } from "react-native";
 
-// design-system.md §2 — Roboto con mismos fallbacks que la web.
-// Familias cargadas vía @expo-google-fonts/roboto en app/_layout.tsx.
-// Pesos relativos: light 300 / regular 400 / medium 500 / bold 700.
 export const FontFamily = {
   light: "Roboto_300Light",
   regular: "Roboto_400Regular",

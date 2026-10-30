@@ -30,7 +30,6 @@ const isDateLike = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
-/** "YYYY-MM-DDTHH:mm" a partir de un Date (lo que espera el formulario). */
 function fechaAForma(date: Date) {
   return (
     `${pad2(date.getDate())}/${pad2(date.getMonth() + 1)}/${date.getFullYear()}` +
@@ -38,7 +37,6 @@ function fechaAForma(date: Date) {
   );
 }
 
-/** Parsea el valor del form ("YYYY-MM-DDTHH:mm") a Date. */
 function formaADate(valor: string) {
   if (!isDateLike.test(valor)) return new Date();
   return new Date(valor);
@@ -138,7 +136,6 @@ export default function PlanTurnoScreen() {
       return;
     }
 
-    // Modo "time": combino la fecha elegida con la hora elegida.
     const base = tempDate;
     const fechaCompleta = new Date(
       base.getFullYear(),

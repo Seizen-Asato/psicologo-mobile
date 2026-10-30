@@ -1,9 +1,12 @@
 import { ConsultorioDto } from "@/models/Consultorio";
 import { Picker } from "@react-native-picker/picker";
+import * as Location from "expo-location";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
+  Linking,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -23,7 +26,6 @@ import {
 
 import { useConsultorio } from "../hooks/useConsultorio";
 
-// Tipo local para los campos de texto del form (todo como string)
 interface ConsultorioFormState {
   consultorioId: number;
   nombre: string;
@@ -52,15 +54,34 @@ export default function ConsultorioForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const [buscando, setBuscando] = useState(false);
+  const [ubicacion, setUbicacion] = useState("");
+
   useEffect(() => {
     fetchAll();
   }, []);
+
+  function abrirAjustesUbicacion() {
+    if (Platform.OS === "android") {
+      Linking.sendIntent("android.settings.LOCATION_SOURCE_SETTINGS").catch(
+        () => Linking.openSettings(),
+      );
+    } else {
+      Linking.openSettings();
+    }
+  }
+
+  function pedirAjustes(titulo: string, mensaje: string) {
+    Alert.alert(titulo, mensaje, [
+      { text: "Ahora no", style: "cancel" },
+      { text: "Abrir ajustes", onPress: () => Linking.openSettings() },
+    ]);
+  }
 
   const handleSubmit = async () => {
     setFormError(null);
     setSuccessMsg(null);
 
-    // Nombre obligatorio
     if (!form.nombre.trim()) {
       setFormError(
         "El nombre del consultorio es obligatorio, si no tiene puede poner 'Consultorio de {su nombre}'",
@@ -68,7 +89,6 @@ export default function ConsultorioForm() {
       return;
     }
 
-    // Calle y número opcionales, pero si se ingresan deben ser válidos
     if (
       form.numero !== "" &&
       (!Number.isInteger(Number(form.numero)) || Number(form.numero) <= 0)
@@ -77,7 +97,6 @@ export default function ConsultorioForm() {
       return;
     }
 
-    // Modalidad obligatoria
     if (!form.tipoModalidadNombre.trim()) {
       setFormError(
         "El nombre de la modalidad es obligatorio, tiene que agregar si es presencial o virtual",
@@ -85,7 +104,6 @@ export default function ConsultorioForm() {
       return;
     }
 
-    // Payload con la misma estructura que espera la API (camelCase)
     const payload = {
       nombre: form.nombre.trim(),
       calle: form.calle.trim() === "" ? null : form.calle.trim(),
@@ -95,7 +113,6 @@ export default function ConsultorioForm() {
     };
 
     if (isEditing) {
-      // Lógica de Actualizar
       const result = await update(form.consultorioId, payload);
       if (result?.success) {
         setSuccessMsg("¡Consultorio actualizado con éxito!");
@@ -105,7 +122,6 @@ export default function ConsultorioForm() {
         setFormError(result?.error || "No se pudo actualizar el consultorio");
       }
     } else {
-      // Lógica de Crear
       const result = await create(payload);
       if (result?.success) {
         setSuccessMsg("¡Consultorio creado con éxito!");
@@ -117,8 +133,6 @@ export default function ConsultorioForm() {
     }
   };
 
-  // Mapea los datos del consultorio seleccionado al formulario.
-  // Trim: evita arrastrar espacios de columnas char de la BD al input.
   const handleEditPress = (item: ConsultorioDto) => {
     setIsEditing(true);
     setForm({
@@ -137,7 +151,6 @@ export default function ConsultorioForm() {
     setForm(emptyForm);
   };
 
-  // Confirma y ejecuta el DELETE del consultorio
   const handleDeletePress = (item: ConsultorioDto) => {
     Alert.alert(
       "Eliminar consultorio",
@@ -150,7 +163,6 @@ export default function ConsultorioForm() {
           onPress: async () => {
             setSuccessMsg(null);
             setFormError(null);
-            // Si estamos editando este consultorio, cancelamos la edición
             if (isEditing && form.consultorioId === item.consultorioId) {
               resetForm();
             }
@@ -168,6 +180,59 @@ export default function ConsultorioForm() {
       ],
       { cancelable: true },
     );
+  };
+
+  const conseguirUbicacion = async () => {
+    try {
+      const { granted } = await Location.requestForegroundPermissionsAsync();
+
+      if (!granted) {
+        return pedirAjustes(
+          "No se peude acceder a la ubicación",
+          "necesitamos los permisos ",
+        );
+      }
+
+      const servicio = await Location.hasServicesEnabledAsync();
+
+      if (!servicio) {
+        Alert.alert("GPS apagado", "Activa la ubicación para continuar", [
+          {
+            text: "Ir a ajustes",
+            onPress: abrirAjustesUbicacion,
+          },
+        ]);
+
+        return;
+      }
+
+      setBuscando(true);
+
+      const ubi = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      const { latitude, longitude } = ubi.coords;
+      let lugar: string | undefined;
+      try {
+        const [dir] = await Location.reverseGeocodeAsync({
+          longitude,
+          latitude,
+        });
+        lugar = [dir?.city ?? dir?.subregion, dir?.region, dir?.country]
+          .filter(Boolean)
+          .join(",");
+      } catch {}
+
+      setUbicacion(lugar ?? "Sin ubicación");
+    } catch {
+      Alert.alert(
+        "No se pudo obtener la ubicación",
+        "Probá de nuevo, cerca de una ventana o al aire libre.",
+      );
+    } finally {
+      setBuscando(false);
+    }
   };
 
   const renderConsultorio = ({ item }: { item: ConsultorioDto }) => (
@@ -192,6 +257,18 @@ export default function ConsultorioForm() {
             <DangerButtonLabel>Eliminar</DangerButtonLabel>
           </DangerButton>
         </View>
+      </View>
+
+      <View style={styles.actionsUbi}>
+        <Text style={styles.cardTextUbi}>
+          📍 {ubicacion || "Sin ubicación"}
+        </Text>
+
+        <SecondaryButton onPress={conseguirUbicacion}>
+          <SecondaryButtonLabel>
+            {buscando ? "Buscando..." : "Ver ubicación"}
+          </SecondaryButtonLabel>
+        </SecondaryButton>
       </View>
     </View>
   );
@@ -284,8 +361,6 @@ export default function ConsultorioForm() {
     </View>
   );
 
-  // Un único contenedor de scroll: el form va como header del FlatList, así
-  // la pantalla entera (form + lista) scrollea con la misma barra.
   return (
     <FlatList
       style={styles.container}
@@ -352,6 +427,18 @@ const makeStyles = (theme: DefaultTheme) =>
       justifyContent: "space-around",
       marginTop: 10,
       gap: 12,
+    },
+    actionsUbi: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: 10,
+    },
+
+    cardTextUbi: {
+      flex: 1,
+      color: theme.colors.textSecondary,
+      marginRight: 10,
     },
     actionBtn: { flex: 1 },
     error: { color: theme.colors.error, marginTop: 8 },

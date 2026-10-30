@@ -29,7 +29,7 @@ export function useConsultorio() {
     try {
       const response = await ConsultorioService.create(dto);
       setConsultorio((prev) => [...prev, response]);
-      return { success: true, data: response }; // <--- Retornamos éxito
+      return { success: true, data: response };
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
@@ -48,16 +48,17 @@ export function useConsultorio() {
     }
   };
 
-  const update = async (id: number, dto: Omit<ConsultorioDto, "consultorioId">) => {
+  const update = async (
+    id: number,
+    dto: Omit<ConsultorioDto, "consultorioId">,
+  ) => {
     setLoading(true);
     setError(null);
     try {
       await ConsultorioService.update(id, dto);
       setConsultorio((prev) =>
         prev.map((c) =>
-          c.consultorioId === id
-            ? { ...dto, consultorioId: id }
-            : c
+          c.consultorioId === id ? { ...dto, consultorioId: id } : c,
         ),
       );
       return { success: true };

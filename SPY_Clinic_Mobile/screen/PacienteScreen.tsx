@@ -9,10 +9,7 @@ import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
-import {
-  SecondaryButton,
-  SecondaryButtonLabel,
-} from "../style/ui/Buttons";
+import { SecondaryButton, SecondaryButtonLabel } from "../style/ui/Buttons";
 
 export default function PacienteScren() {
   const {
@@ -68,13 +65,13 @@ export default function PacienteScren() {
           <SecondaryButton
             onPress={() => setSelectedPaciente(p)}
             accessibilityRole="button"
-            accessibilityLabel={`Editar ${p.Nombre}`}
+            accessibilityLabel={`Editar ${p.nombre}`}
           >
-            <SecondaryButtonLabel>Editar {p.Nombre}</SecondaryButtonLabel>
+            <SecondaryButtonLabel>Editar {p.nombre}</SecondaryButtonLabel>
           </SecondaryButton>
           <PacienteRemove
             pacienteId={p.Id!}
-            pacienteNombre={p.Nombre}
+            pacienteNombre={p.nombre}
             onRemove={removePacienteMutation.mutate}
             isLoading={removePacienteMutation.isPending}
             error={removePacienteMutation.error}

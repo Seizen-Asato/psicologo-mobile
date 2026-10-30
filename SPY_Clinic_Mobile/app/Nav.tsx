@@ -1,11 +1,6 @@
 import { Link, usePathname } from "expo-router";
 import styled from "styled-components/native";
 
-// design-system.md §1.2/1.3 + §1.4.
-// Barra scrolleable: 7 items no caben en 360px. Táctil mínimo 44x44.
-// Activo = texto `textPrimary` 700 + subrayado `actionPrimary`
-// (lima/ámbar como texto pequeño sobre claro falla contraste, §1.4).
-
 const NAV_ITEMS: { href: any; label: string }[] = [
   { href: "/home", label: "Inicio" },
   { href: "/paciente", label: "Paciente" },

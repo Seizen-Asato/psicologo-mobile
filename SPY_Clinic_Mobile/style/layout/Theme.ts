@@ -13,7 +13,6 @@ const radius = {
   large: 16,
 };
 
-// WCAG §1.4 — mínimo táctil 44x44px.
 const touchMin = 44;
 
 export const lightTheme: DefaultTheme = {

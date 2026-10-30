@@ -160,9 +160,6 @@ export default function TurnoForm({
         <Text style={styles.label}>Modalidad presencial</Text>
       )}
 
-      {/* chekear si cambaimos cantidad de turnos u tuliziamos solo plan turno pero hay que ver
-        si abra que modificar la base de datos
-      */}
       <Text style={styles.label}>Cantidad de Turnos</Text>
       <TextInput
         style={styles.input}

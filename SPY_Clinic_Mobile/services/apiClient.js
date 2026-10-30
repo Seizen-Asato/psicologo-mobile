@@ -23,7 +23,6 @@ export async function fetchApi(url, options = {}) {
       );
     }
 
-    // PUT/DELETE suelen responder 204 No Content (sin cuerpo): no hacer json()
     const responseText = await response.text();
     if (!responseText) return null;
     return JSON.parse(responseText);

@@ -11,8 +11,8 @@ type PacienteFormProps = {
 };
 
 const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
-  const [Nombre, setNombre] = useState(selected?.Nombre ?? "");
-  const [Apellido, setApellido] = useState(selected?.Apellido ?? "");
+  const [Nombre, setNombre] = useState(selected?.nombre ?? "");
+  const [Apellido, setApellido] = useState(selected?.apellido ?? "");
   const [fechaNacimiento, setFechaNacimiento] = useState(
     selected?.fechaNacimiento ?? new Date(),
   );

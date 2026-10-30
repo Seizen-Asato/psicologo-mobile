@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
-import { FechaPicker, HoraPicker } from "./FechaHoraPicker";
 import { AgendaDto } from "../models/AgendaDto";
 import * as consultorioService from "../services/ConsultorioService";
 import * as pacientesService from "../services/PacienteService";
 import * as psicologosService from "../services/PsicologoService";
 import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
+import { FechaPicker, HoraPicker } from "./FechaHoraPicker";
 
 interface AgendaFormProps {
   onCreate: (agenda: AgendaDto) => Promise<void>;
@@ -59,9 +59,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
       horaInicio: horaInicioFormatted,
       horaFin: horaFinFormatted,
       diaSemana: agenda.fecha
-        ? /* Parse "YYYY-MM-DD" en zona local: new Date(iso) lo interpreta en
-             UTC y desfasa el weekday en zonas horarias negativas. */
-          (() => {
+        ? (() => {
             const [y, m, d] = agenda.fecha.slice(0, 10).split("-").map(Number);
             return new Date(y, m - 1, d).toLocaleDateString("es-ES", {
               weekday: "long",
