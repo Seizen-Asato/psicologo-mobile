@@ -1,6 +1,14 @@
 import { PacienteDto } from "@/models/PacienteDto";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Button,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
 import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
@@ -11,27 +19,40 @@ type PacienteFormProps = {
 };
 
 const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
-  const [Nombre, setNombre] = useState(selected?.nombre ?? "");
-  const [Apellido, setApellido] = useState(selected?.apellido ?? "");
-  const [fechaNacimiento, setFechaNacimiento] = useState(
-    selected?.fechaNacimiento ?? new Date(),
-  );
-  const [Mail, setMail] = useState(selected?.Mail ?? "");
-  const [Dni, setDni] = useState(selected?.Dni ?? "");
-  const [Telefono, setTelefono] = useState(selected?.Telefono ?? "");
-  const theme = useTheme();
-  const styles = makeStyles(theme);
+  const [nombre, setNombre] = useState(selected?.nombre ?? "");
+  const [apellido, setApellido] = useState(selected?.apellido ?? "");
+  const [dni, setDni] = useState(selected?.dni ?? "");
+  const [telefono, setTelefono] = useState(selected?.telefono ?? "");
+  const [email, setEmail] = useState(selected?.email ?? "");
+
+  const [fechaNacimiento, setFechaNacimiento] = useState<Date>(() => {
+    if (selected?.fechaNacimiento) {
+      const fecha = new Date(`${selected.fechaNacimiento}T00:00:00`);
+      if (!Number.isNaN(fecha.getTime())) return fecha;
+    }
+
+    return new Date();
+  });
+
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
   const handleSubmit = () => {
     const paciente: PacienteDto = {
-      Id: selected?.Id,
-      Nombre,
-      Apellido,
-      Mail,
-      Dni,
-      Telefono,
-      fechaNacimiento,
+      pacienteId: selected?.pacienteId,
+      nombre: nombre.trim(),
+      apellido: apellido.trim(),
+      dni: dni.trim() || null,
+      telefono: telefono.trim() || null,
+      email: email.trim() || null,
+      fechaNacimiento: [
+        fechaNacimiento.getFullYear(),
+        String(fechaNacimiento.getMonth() + 1).padStart(2, "0"),
+        String(fechaNacimiento.getDate()).padStart(2, "0"),
+      ].join("-"),
+      numeroPaciente: selected?.numeroPaciente ?? null,
+      planTurnoId: selected?.planTurnoId ?? null,
     };
+
     onSave(paciente);
   };
 
@@ -42,7 +63,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       <Text style={styles.label}>Nombre</Text>
       <TextInput
         style={styles.input}
-        value={Nombre}
+        value={nombre}
         onChangeText={setNombre}
         placeholder="Ingrese nombre"
         placeholderTextColor={theme.colors.textDisabled}
@@ -51,7 +72,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       <Text style={styles.label}>Apellido</Text>
       <TextInput
         style={styles.input}
-        value={Apellido}
+        value={apellido}
         onChangeText={setApellido}
         placeholder="Ingrese apellido"
         placeholderTextColor={theme.colors.textDisabled}
@@ -60,7 +81,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       <Text style={styles.label}>DNI</Text>
       <TextInput
         style={styles.input}
-        value={Dni}
+        value={dni}
         onChangeText={setDni}
         placeholder="Ingrese DNI"
         placeholderTextColor={theme.colors.textDisabled}
@@ -70,68 +91,95 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
       <Text style={styles.label}>Teléfono</Text>
       <TextInput
         style={styles.input}
-        value={Telefono}
+        value={telefono}
         onChangeText={setTelefono}
         placeholder="Ingrese teléfono"
         placeholderTextColor={theme.colors.textDisabled}
         keyboardType="phone-pad"
       />
 
-      <Text style={styles.label}>Mail</Text>
+      <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
-        value={Mail}
-        onChangeText={setMail}
+        value={email}
+        onChangeText={setEmail}
         placeholder="Ingrese correo electrónico"
         placeholderTextColor={theme.colors.textDisabled}
         keyboardType="email-address"
+        autoCapitalize="none"
       />
 
       <Text style={styles.label}>Fecha de nacimiento</Text>
-      <TextInput
-        style={styles.input}
-        value={fechaNacimiento.toISOString().split("T")[0]}
-        onChangeText={(text) => setFechaNacimiento(new Date(text))}
-        placeholder="YYYY-MM-DD"
-        placeholderTextColor={theme.colors.textDisabled}
-      />
 
-      <PrimaryButton
-        onPress={handleSubmit}
-        accessibilityRole="button"
-        accessibilityLabel="Guardar paciente"
+      <Pressable
+        style={styles.dateInput}
+        onPress={() => setMostrarCalendario(true)}
       >
-        <PrimaryButtonLabel>Guardar</PrimaryButtonLabel>
-      </PrimaryButton>
+        <Text style={styles.dateText}>
+          {fechaNacimiento.toLocaleDateString("es-AR")}
+        </Text>
+      </Pressable>
+
+      {mostrarCalendario && (
+        <DateTimePicker
+          value={fechaNacimiento}
+          mode="date"
+          display="calendar"
+          maximumDate={new Date()}
+          onChange={(_event, date) => {
+            if (date) {
+              setFechaNacimiento(date);
+            }
+
+            setMostrarCalendario(false);
+          }}
+          onDismiss={() => setMostrarCalendario(false)}
+        />
+      )}
+
+      <View style={styles.saveButton}>
+        <Button title="Guardar" onPress={handleSubmit} />
+      </View>
     </View>
   );
 };
 
-const makeStyles = (theme: DefaultTheme) =>
-  StyleSheet.create({
-    container: { padding: 16, backgroundColor: theme.colors.background },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      marginBottom: 12,
-      color: theme.colors.textPrimary,
-    },
-    label: {
-      marginBottom: 4,
-      fontWeight: "600",
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-    },
-    input: {
-      borderWidth: 1,
-      borderColor: theme.colors.borderInput,
-      backgroundColor: theme.colors.surface,
-      color: theme.colors.textPrimary,
-      borderRadius: 6,
-      minHeight: 44,
-      padding: 12,
-      marginBottom: 12,
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  label: {
+    marginBottom: 4,
+    fontWeight: "600",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 12,
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    padding: 12,
+    minHeight: 44,
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  dateText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  saveButton: {
+    marginTop: 8,
+  },
+});
 
 export default PacienteForm;

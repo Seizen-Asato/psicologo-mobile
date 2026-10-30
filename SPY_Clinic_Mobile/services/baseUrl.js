@@ -13,6 +13,8 @@ if (Platform.OS === "android" && !Device.isDevice) {
   // Web (corre en el navegador de la misma PC)
   BASE_URL = `http://localhost:${PORT}/api`;
 } else {
+  // Dispositivo físico
+  BASE_URL = "http://192.168.0.221:5008/api";
   // Dispositivo físico (debe estar en la misma red Wi-Fi que la PC)
   BASE_URL = `http://${LAN_IP}:${PORT}/api`;
 }

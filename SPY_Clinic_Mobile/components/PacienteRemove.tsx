@@ -1,5 +1,13 @@
 import React from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { Feather } from "@expo/vector-icons";
 import type { DefaultTheme } from "styled-components";
 import { useTheme } from "styled-components/native";
 import { DangerButton, SecondaryButtonLabel } from "../style/ui/Buttons";
@@ -42,28 +50,41 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
 
   return (
     <View style={styles.container}>
-      {isLoading && (
-        <ActivityIndicator size="small" color={theme.colors.actionPrimary} />
+      {isLoading ? (
+        <ActivityIndicator size="small" color="#D9534F" />
+      ) : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Eliminar a ${pacienteNombre}`}
+          onPress={handleRemove}
+          style={styles.actionButton}
+        >
+          <Feather name="trash-2" size={20} color="#D9534F" />
+        </Pressable>
       )}
       {error ? (
         <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>
       ) : null}
 
-      <DangerButton
-        onPress={handleRemove}
-        accessibilityRole="button"
-        accessibilityLabel="Eliminar paciente"
-      >
-        <SecondaryButtonLabel>Eliminar paciente</SecondaryButtonLabel>
-      </DangerButton>
+      {error != null && (
+        <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>
+      )}
     </View>
   );
 };
 
-const makeStyles = (theme: DefaultTheme) =>
-  StyleSheet.create({
-    container: { marginVertical: 8 },
-    error: { color: theme.colors.error, marginTop: 4 },
-  });
+const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionButton: {
+    padding: 8,
+  },
+  error: {
+    color: "red",
+    marginTop: 4,
+  },
+});
 
 export default PacienteRemove;

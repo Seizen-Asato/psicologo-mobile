@@ -151,9 +151,8 @@ const CalendarView: React.FC<
         height={600}
         mode={mode}
         date={currentDate}
-        theme={calendarTheme}
-        onPressEvent={(event: CalendarEvent) =>
-          onSelectAgenda(event.resource)
+        onPressEvent={(event: EventoDto) =>
+          console.log("Evento seleccionado:", event)
         }
       />
     </View>

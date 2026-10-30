@@ -35,7 +35,7 @@ export default function TurnoScreen() {
     <TurnoForm
       onSave={handleSave}
       onReset={handleReset}
-      selectedTurno={selectedTurno}
+      selectedTurno={selectedTurno ?? undefined}
     />
   );
 }

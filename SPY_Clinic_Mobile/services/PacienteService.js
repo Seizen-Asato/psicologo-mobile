@@ -6,6 +6,7 @@ export async function getAll() {
 }
 
 export async function getById(id) {
+  console.log("🔎 getById de paciente recibió:", id);
   return await fetchApi(`${BASE_URL}/paciente/${id}`);
 }
 

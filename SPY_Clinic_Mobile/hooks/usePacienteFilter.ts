@@ -9,11 +9,13 @@ export function usePacienteFilter(pacientesData: PacienteDto[]) {
   };
 
   const filterPaciente = useMemo(() => {
-    if (!filter) return pacientesData;
+    if (!filter.trim()) return pacientesData;
+
     return pacientesData.filter((p) =>
-      p.nombre.toLowerCase().includes(filter.toLowerCase()),
+      p.nombre.toLowerCase().includes(filter.trim().toLowerCase()),
     );
   }, [filter, pacientesData]);
+
   return {
     pacienteNameFilter,
     filter,
