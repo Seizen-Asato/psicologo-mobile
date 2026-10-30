@@ -1,16 +1,38 @@
 import { DefaultTheme } from "styled-components/native";
+import { Contrast, DarkColors, LightColors } from "./Colorors";
 
-export const theme: DefaultTheme = {
+const spacing = {
+  small: 8,
+  medium: 16,
+  large: 24,
+};
+
+const radius = {
+  small: 6,
+  medium: 12,
+  large: 16,
+};
+
+const touchMin = 44;
+
+export const lightTheme: DefaultTheme = {
   colors: {
-    background: "#0f172a",
-    card: "#1e293b",
-    text: "#f8fafc",
-    accent: "#38bdf8",
-    border: "#334155",
+    ...LightColors,
+    onAction: Contrast.onAction,
+    focus: LightColors.actionSecondary,
   },
-  spacing: {
-    small: 8,
-    medium: 16,
-    large: 24,
+  spacing,
+  radius,
+  touchMin,
+};
+
+export const darkTheme: DefaultTheme = {
+  colors: {
+    ...DarkColors,
+    onAction: Contrast.onAction,
+    focus: DarkColors.actionSecondary,
   },
+  spacing,
+  radius,
+  touchMin,
 };

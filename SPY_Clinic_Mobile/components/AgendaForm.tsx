@@ -1,77 +1,203 @@
-import React, { useState } from "react";
-import { Button, TextInput, View } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
 import { AgendaDto } from "../models/AgendaDto";
+import * as consultorioService from "../services/ConsultorioService";
+import * as pacientesService from "../services/PacienteService";
+import * as psicologosService from "../services/PsicologoService";
+import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
+import { FechaPicker, HoraPicker } from "./FechaHoraPicker";
 
 interface AgendaFormProps {
   onCreate: (agenda: AgendaDto) => Promise<void>;
 }
 
 const AgendaForm: React.FC<AgendaFormProps> = ({ onCreate }) => {
-  const [fecha, setFecha] = useState("");
-  const [horaInicio, setHoraInicio] = useState("");
-  const [horaFin, setHoraFin] = useState("");
-  const [psicologoId, setPsicologoId] = useState<number>(0);
-  const [descripcion, setDescripcion] = useState<string>("");
+  const [psicologos, setPsicologos] = useState<any[]>([]);
+  const [pacientes, setPacientes] = useState<any[]>([]);
+  const [consultorio, setConsultorio] = useState<any[]>([]);
+  const theme = useTheme();
+  const styles = makeStyles(theme);
+  const [agenda, setAgenda] = useState<AgendaDto>({
+    agendaId: 0,
+    psicologoId: 0,
+    pacienteId: "",
+    consultorioId: "",
+    diaSemana: "",
+    horaInicio: "",
+    horaFin: "",
+    fecha: "",
+    descripcion: "",
+    titulo: "",
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setPsicologos(await psicologosService.getAll());
+        setPacientes(await pacientesService.getAll());
+        setConsultorio(await consultorioService.getAll());
+      } catch (error) {
+        console.error("Error al cargar datos del formulario", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSubmit = async () => {
     const horaInicioFormatted =
-      horaInicio.length === 5 ? `${horaInicio}:00` : horaInicio;
-    const horaFinFormatted = horaFin.length === 5 ? `${horaFin}:00` : horaFin;
+      agenda.horaInicio.length === 5
+        ? `${agenda.horaInicio}:00`
+        : agenda.horaInicio;
+    const horaFinFormatted =
+      agenda.horaFin.length === 5 ? `${agenda.horaFin}:00` : agenda.horaFin;
+
     const newAgenda: AgendaDto = {
-      agendaId: 0,
-      psicologoId,
-      psicologoNombre: "",
-      psicologoApellido: "",
-      consultorioId: 1,
-      diaSemana: "",
+      ...agenda,
       horaInicio: horaInicioFormatted,
       horaFin: horaFinFormatted,
-      fecha,
-      descripcion,
+      diaSemana: agenda.fecha
+        ? (() => {
+            const [y, m, d] = agenda.fecha.slice(0, 10).split("-").map(Number);
+            return new Date(y, m - 1, d).toLocaleDateString("es-ES", {
+              weekday: "long",
+            });
+          })()
+        : "",
     };
 
     await onCreate(newAgenda);
-    setFecha("");
-    setHoraInicio("");
-    setHoraFin("");
-    setPsicologoId(0);
+
+    setAgenda({
+      agendaId: 0,
+      psicologoId: 0,
+      pacienteId: "",
+      consultorioId: "",
+      diaSemana: "",
+      horaInicio: "",
+      horaFin: "",
+      fecha: "",
+      descripcion: "",
+      titulo: "",
+    });
   };
 
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View style={styles.container}>
       <TextInput
-        placeholder="Fecha (YYYY-MM-DD)"
-        value={fecha}
-        onChangeText={setFecha}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        placeholder="Título"
+        placeholderTextColor={theme.colors.textDisabled}
+        value={agenda.titulo}
+        onChangeText={(text) => setAgenda({ ...agenda, titulo: text })}
+        style={styles.input}
       />
-      <TextInput
-        placeholder="Hora inicio (HH:mm)"
-        value={horaInicio}
-        onChangeText={setHoraInicio}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+
+      <FechaPicker
+        value={agenda.fecha}
+        onChange={(fecha) => setAgenda({ ...agenda, fecha })}
       />
-      <TextInput
-        placeholder="Hora fin (HH:mm)"
-        value={horaFin}
-        onChangeText={setHoraFin}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+
+      <HoraPicker
+        value={agenda.horaInicio}
+        onChange={(hora) => setAgenda({ ...agenda, horaInicio: hora })}
+        placeholder="Seleccionar hora inicio..."
       />
+
+      <HoraPicker
+        value={agenda.horaFin}
+        onChange={(hora) => setAgenda({ ...agenda, horaFin: hora })}
+        placeholder="Seleccionar hora fin..."
+      />
+
       <TextInput
         placeholder="Descripción"
-        value={descripcion}
-        onChangeText={setDescripcion}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        placeholderTextColor={theme.colors.textDisabled}
+        value={agenda.descripcion}
+        onChangeText={(text) => setAgenda({ ...agenda, descripcion: text })}
+        style={styles.input}
       />
-      <TextInput
-        placeholder="ID Psicólogo"
-        value={psicologoId.toString()}
-        onChangeText={(text) => setPsicologoId(Number(text))}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
-      />
-      <Button title="Crear Agenda" onPress={handleSubmit} />
+
+      <Picker
+        selectedValue={agenda.psicologoId}
+        onValueChange={(value) =>
+          setAgenda({ ...agenda, psicologoId: Number(value) })
+        }
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
+      >
+        <Picker.Item label="Seleccione psicólogo..." value={0} />
+        {psicologos.map((p) => (
+          <Picker.Item
+            key={p.psicologoId}
+            label={`${p.nombre} ${p.apellido}`}
+            value={p.psicologoId}
+          />
+        ))}
+      </Picker>
+
+      <Picker
+        selectedValue={agenda.pacienteId}
+        onValueChange={(value) => setAgenda({ ...agenda, pacienteId: value })}
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
+      >
+        <Picker.Item label="Seleccione paciente..." value="" />
+        {pacientes.map((p) => (
+          <Picker.Item
+            key={p.pacienteId}
+            label={`${p.nombre} ${p.apellido}`}
+            value={p.pacienteId}
+          />
+        ))}
+      </Picker>
+
+      <Picker
+        selectedValue={agenda.consultorioId}
+        onValueChange={(value) =>
+          setAgenda({ ...agenda, consultorioId: value })
+        }
+        dropdownIconColor={theme.colors.textSecondary}
+        itemStyle={{ color: theme.colors.textPrimary }}
+        style={{ color: theme.colors.textPrimary }}
+      >
+        <Picker.Item label="Seleccione consultorio..." value="" />
+        {consultorio.map((c) => (
+          <Picker.Item
+            key={c.consultorioId}
+            label={`${c.nombre}`}
+            value={c.consultorioId}
+          />
+        ))}
+      </Picker>
+
+      <PrimaryButton
+        onPress={handleSubmit}
+        accessibilityRole="button"
+        accessibilityLabel="Crear agenda"
+      >
+        <PrimaryButtonLabel>Crear Agenda</PrimaryButtonLabel>
+      </PrimaryButton>
     </View>
   );
 };
+
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: { marginBottom: 20 },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+      borderRadius: 6,
+      minHeight: 44,
+      marginBottom: 10,
+      padding: 12,
+    },
+  });
 
 export default AgendaForm;

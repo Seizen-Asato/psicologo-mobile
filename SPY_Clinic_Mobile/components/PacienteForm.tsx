@@ -9,6 +9,9 @@ import {
   TextInput,
   View,
 } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import { PrimaryButton, PrimaryButtonLabel } from "../style/ui/Buttons";
 
 type PacienteFormProps = {
   onSave: (paciente: PacienteDto) => void;
@@ -63,6 +66,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={nombre}
         onChangeText={setNombre}
         placeholder="Ingrese nombre"
+        placeholderTextColor={theme.colors.textDisabled}
       />
 
       <Text style={styles.label}>Apellido</Text>
@@ -71,6 +75,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={apellido}
         onChangeText={setApellido}
         placeholder="Ingrese apellido"
+        placeholderTextColor={theme.colors.textDisabled}
       />
 
       <Text style={styles.label}>DNI</Text>
@@ -79,6 +84,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={dni}
         onChangeText={setDni}
         placeholder="Ingrese DNI"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="numeric"
       />
 
@@ -88,6 +94,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={telefono}
         onChangeText={setTelefono}
         placeholder="Ingrese teléfono"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="phone-pad"
       />
 
@@ -97,6 +104,7 @@ const PacienteForm: React.FC<PacienteFormProps> = ({ onSave, selected }) => {
         value={email}
         onChangeText={setEmail}
         placeholder="Ingrese correo electrónico"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="email-address"
         autoCapitalize="none"
       />

@@ -1,6 +1,12 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../context/Auth";
 import { Login } from "../services/authService";
 import {
@@ -10,15 +16,19 @@ import {
   Label,
   LoginButton,
   LoginCard,
+  LoginSafeArea,
+  LoginThemeToggle,
   LoginWrapper,
   Title,
 } from "../style/ui/LoginScreenStyle";
+import ThemeToggle from "./ThemeToggle";
 
 const LoginMobile = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+  const insets = useSafeAreaInsets();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -36,29 +46,63 @@ const LoginMobile = () => {
   };
 
   return (
-    <LoginWrapper>
-      <LoginCard>
-        <Title>Iniciar sesión</Title>
-        <InputGroup>
-          <Label>Email</Label>
-          <Input
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </InputGroup>
+    <LoginSafeArea>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <LoginWrapper>
+            <LoginCard>
+              <Title>Iniciar sesión</Title>
+              <InputGroup>
+                <Label>Email</Label>
+                <Input
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  textContentType="emailAddress"
+                  returnKeyType="next"
+                  accessibilityLabel="Correo electrónico"
+                  accessibilityHint="Ingresa tu correo para iniciar sesión"
+                />
+              </InputGroup>
 
-        <InputGroup>
-          <Label>Password</Label>
-          <Input secureTextEntry value={password} onChangeText={setPassword} />
-        </InputGroup>
+              <InputGroup>
+                <Label>Password</Label>
+                <Input
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                  textContentType="password"
+                  returnKeyType="done"
+                  onSubmitEditing={handleLogin}
+                  accessibilityLabel="Contraseña"
+                  accessibilityHint="Ingresa tu contraseña"
+                />
+              </InputGroup>
 
-        <LoginButton onPress={handleLogin}>
-          <ButtonText>Iniciar Sesión</ButtonText>
-        </LoginButton>
-      </LoginCard>
-    </LoginWrapper>
+              <LoginButton
+                onPress={handleLogin}
+                accessibilityRole="button"
+                accessibilityLabel="Iniciar sesión"
+                accessibilityHint="Envía tus credenciales e ingresa a la app"
+              >
+                <ButtonText>Iniciar Sesión</ButtonText>
+              </LoginButton>
+            </LoginCard>
+          </LoginWrapper>
+        </ScrollView>
+      </KeyboardAvoidingView>
+      <LoginThemeToggle $top={insets.top + 12}>
+        <ThemeToggle />
+      </LoginThemeToggle>
+    </LoginSafeArea>
   );
 };
 

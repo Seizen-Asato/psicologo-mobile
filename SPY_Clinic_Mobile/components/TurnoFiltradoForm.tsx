@@ -1,89 +1,97 @@
 import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import { FechaPicker } from "./FechaHoraPicker";
+import {
+  PrimaryButton,
+  PrimaryButtonLabel,
+  SecondaryButton,
+  SecondaryButtonLabel,
+} from "../style/ui/Buttons";
 
 interface TurnoFiltradoFormProps {
-  onFilter: (filters: {
-    date?: string;
-    pacienteId?: string;
-    turnoId?: string;
-    turnoPaciente?: string;
-    turnoPacienteId?: string;
-  }) => void;
+  onFilter: (filters: { titulo?: string; date?: string }) => void;
+
   onReset: () => void;
 }
-
 const TurnoFiltradoForm: React.FC<TurnoFiltradoFormProps> = ({
   onFilter,
   onReset,
 }) => {
-  const [date, setDate] = useState("");
-  const [pacienteId, setPacienteId] = useState("");
-  const [turnoId, setTurnoId] = useState("");
-  const [turnoPaciente, setTurnoPaciente] = useState("");
-  const [turnoPacienteId, setTurnoPacienteId] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const [tituloFilter, setTituloFilter] = useState("");
 
+  const theme = useTheme();
+  const styles = makeStyles(theme);
   const handleSubmit = () => {
-    onFilter({ date, pacienteId, turnoId, turnoPaciente, turnoPacienteId });
+    onFilter({
+      titulo: tituloFilter,
+      date: dateFilter,
+    });
+  };
+  const handleReset = () => {
+    setTituloFilter("");
+    setDateFilter("");
+    onReset();
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Filtrado</Text>
-
       <TextInput
+        placeholder="Título"
+        placeholderTextColor={theme.colors.textDisabled}
+        value={tituloFilter}
+        onChangeText={setTituloFilter}
         style={styles.input}
-        placeholder="Paciente ID"
-        value={pacienteId}
-        onChangeText={setPacienteId}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Turno ID"
-        value={turnoId}
-        onChangeText={setTurnoId}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Fecha (YYYY-MM-DD)"
-        value={date}
-        onChangeText={setDate}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Turno Paciente"
-        value={turnoPaciente}
-        onChangeText={setTurnoPaciente}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Turno Paciente ID"
-        value={turnoPacienteId}
-        onChangeText={setTurnoPacienteId}
       />
 
-      <View style={styles.actions}>
-        <Button title="Filtrar" onPress={handleSubmit} />
-        <Button title="Ver todos" color="gray" onPress={onReset} />
-      </View>
+      <FechaPicker
+        value={dateFilter}
+        onChange={setDateFilter}
+        placeholder="Seleccionar fecha para filtrar..."
+      />
+
+      <PrimaryButton
+        onPress={handleSubmit}
+        accessibilityRole="button"
+        accessibilityLabel="Buscar turnos"
+      >
+        <PrimaryButtonLabel>Buscar</PrimaryButtonLabel>
+      </PrimaryButton>
+      <View style={styles.spacer} />
+      <SecondaryButton
+        onPress={handleReset}
+        accessibilityRole="button"
+        accessibilityLabel="Ver todos los turnos"
+      >
+        <SecondaryButtonLabel>Ver todos</SecondaryButtonLabel>
+      </SecondaryButton>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  text: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 8,
-    marginBottom: 10,
-  },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 10,
-  },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      marginBottom: 20,
+      padding: 12,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      backgroundColor: theme.colors.background,
+      color: theme.colors.textPrimary,
+      borderRadius: 6,
+      minHeight: 44,
+      marginBottom: 10,
+      padding: 12,
+    },
+    spacer: { height: 8 },
+  });
 
 export default TurnoFiltradoForm;

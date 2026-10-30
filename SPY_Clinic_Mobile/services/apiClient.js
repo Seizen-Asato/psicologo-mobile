@@ -21,9 +21,14 @@ export async function fetchApi(url, options = {}) {
       );
     }
 
-    return await response.json();
+    const responseText = await response.text();
+    if (!responseText) return null;
+    return JSON.parse(responseText);
   } catch (error) {
-    console.error("❌ Error al llamar a la API:", error.message);
-    throw error;
+    const message = error?.message?.includes("Network request failed")
+      ? `No se pudo conectar a ${url} — verificá que la API esté corriendo y que services/baseUrl.js apunte a la IP correcta de la PC.`
+      : error.message;
+    console.error("❌ Error al llamar a la API:", message);
+    throw new Error(message);
   }
 }

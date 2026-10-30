@@ -1,12 +1,27 @@
 import { TurnoDto } from "@/models/TurnoDto";
 import * as turnosService from "@/services/TurnoService";
-import { getWeekRange } from "@/utils/DateUtils";
+import { getWeekRange, isValidDate } from "@/utils/DateUtils";
 import { useState } from "react";
 
 export function useTurno() {
   const [turnos, setTurnos] = useState<TurnoDto[]>([]);
+  const [apellido, setApellido] = useState<string>("");
+  const [estado, setEstado] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const fetchTurnosALL = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await turnosService.getAll();
+      setTurnos(data || []);
+    } catch {
+      setError("Error al cargar turnos");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchTurnosSemana = async (date: Date = new Date()) => {
     setLoading(true);
@@ -14,17 +29,26 @@ export function useTurno() {
     try {
       const { desde, hasta } = getWeekRange(date);
       const data = await turnosService.getByRange(desde, hasta);
-      setTurnos(data);
-    } catch (err: any) {
+      setTurnos(data || []);
+    } catch {
       setError("Error al cargar turnos de la semana");
     } finally {
       setLoading(false);
     }
   };
-  //validacion provisoria, luego implementaremos un pop-up pero eso lo dejamos apra los siguientes sprint
+
+  const fetchTurnoById = async (id: number) => {
+    const turno = await turnosService.getById(id);
+    // El backend serializa hora como "HH:mm:ss"; el formulario usa "HH:mm".
+    if (turno && typeof turno.hora === "string") {
+      return { ...turno, hora: turno.hora.slice(0, 5) };
+    }
+    return turno;
+  };
+
   const validateTurno = (turno: TurnoDto) => {
     if (!turno.fecha) throw new Error("La fecha es obligatoria");
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(turno.fecha))
+    if (!isValidDate(turno.fecha))
       throw new Error("Formato de fecha inválido (YYYY-MM-DD)");
     if (!turno.hora) throw new Error("La hora es obligatoria");
     if (!/^\d{2}:\d{2}$/.test(turno.hora))
@@ -35,6 +59,21 @@ export function useTurno() {
       throw new Error("Debe ingresar la URL de la sesión virtual");
     if (!turno.psicologoId) throw new Error("Debe seleccionar un psicólogo");
     if (!turno.pacienteId) throw new Error("Debe seleccionar un paciente");
+  };
+
+  const filterTurnos = () => {
+    let filtrados = turnos;
+    if (apellido) {
+      filtrados = filtrados.filter((t) =>
+        (t.paciente?.apellido ?? "")
+          .toUpperCase()
+          .startsWith(apellido.toUpperCase()),
+      );
+    }
+    if (estado) {
+      filtrados = filtrados.filter((t) => t.estado === estado);
+    }
+    return filtrados;
   };
 
   const saveTurno = async (turno: TurnoDto) => {
@@ -62,10 +101,41 @@ export function useTurno() {
     try {
       await turnosService.remove(id);
       await fetchTurnosSemana();
-    } catch (err: any) {
+    } catch {
       setError("Error al eliminar turno");
     } finally {
       setLoading(false);
+    }
+  };
+  // Las respuestas PUT pueden ser 204 (fetchApi devuelve null): actualizamos
+  // solo el campo 'asistencia' del turno sobre el estado local.
+  const markAsistio = async (id: string) => {
+    try {
+      await turnosService.update(id, { asistencia: true });
+      setTurnos((prev) =>
+        prev.map((t) => (t.turnoId === id ? { ...t, asistencia: true } : t)),
+      );
+      return { success: true };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.message || "Error al marcar asistencia",
+      };
+    }
+  };
+
+  const markAusente = async (id: string) => {
+    try {
+      await turnosService.update(id, { asistencia: false });
+      setTurnos((prev) =>
+        prev.map((t) => (t.turnoId === id ? { ...t, asistencia: false } : t)),
+      );
+      return { success: true };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.message || "Error al marcar ausencia",
+      };
     }
   };
 
@@ -73,8 +143,17 @@ export function useTurno() {
     turnos,
     loading,
     error,
+    apellido,
+    estado,
+    setApellido,
+    setEstado,
+    fetchTurnosALL,
+    fetchTurnoById,
     fetchTurnosSemana,
+    filterTurnos,
     saveTurno,
     removeTurno,
+    markAsistio,
+    markAusente,
   };
 }

@@ -17,6 +17,9 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import { SecondaryButton, SecondaryButtonLabel } from "../style/ui/Buttons";
 
 export default function PacienteScreen() {
   const {
@@ -33,7 +36,8 @@ export default function PacienteScreen() {
     update: PacienteService.update,
     remove: PacienteService.remove,
   });
-
+  const theme = useTheme();
+  const styles = makeStyles(theme);
   const [selectedPaciente, setSelectedPaciente] = useState<
     PacienteDto | undefined
   >(undefined);
@@ -62,11 +66,19 @@ export default function PacienteScreen() {
   };
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#007AFF" />;
+    return (
+      <View style={styles.feedback}>
+        <ActivityIndicator size="large" color={theme.colors.actionPrimary} />
+      </View>
+    );
   }
 
   if (error) {
-    return <Text style={styles.error}>Error al cargar pacientes</Text>;
+    return (
+      <View style={styles.feedback}>
+        <Text style={styles.error}>Error al cargar pacientes</Text>
+      </View>
+    );
   }
 
   return (

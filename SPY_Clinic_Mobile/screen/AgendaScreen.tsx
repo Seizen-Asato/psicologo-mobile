@@ -1,62 +1,29 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AgendaDto } from "@/models/AgendaDto";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+
+import { useRouter } from "expo-router";
+
 import AgendaForm from "../components/AgendaForm";
-import CalenderView from "../components/CalenderView";
-import { AgendaDto } from "../models/AgendaDto";
-import {
-  create,
-  getAll,
-  getByDate,
-  getByPatient,
-} from "../services/calendarService";
+import CalendarView from "../components/CalenderView";
+import { useAgenda } from "../hooks/useAgenda";
 
 const AgendaScreen = () => {
-  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { agenda, isLoading, error, createAgenda, getAgendaByDate, reload } =
+    useAgenda();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
-  const {
-    data: agenda = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["agenda"],
-    queryFn: getAll,
-  });
-
-  const createAgendaMutation = useMutation({
-    mutationFn: (agenda: AgendaDto) => create(agenda),
-    onSuccess: (newAgenda) => {
-      queryClient.setQueryData(["agenda"], (old: AgendaDto[] = []) => [
-        ...old,
-        newAgenda,
-      ]);
-    },
-  });
-
-  const handleCreateAgenda = async (agenda: AgendaDto) => {
-    await createAgendaMutation.mutateAsync(agenda);
+  const handleCreateAgenda = async (newAgenda: AgendaDto) => {
+    await createAgenda.mutateAsync(newAgenda);
   };
-
-  const mapAgendaToEvents = (items: AgendaDto[]) =>
-    items.map((a) => ({
-      id: a.agendaId,
-      title: `${a.psicologoNombre} ${a.psicologoApellido}`,
-      start: new Date(`${a.fecha}T${a.horaInicio}`),
-      end: new Date(`${a.fecha}T${a.horaFin}`),
-      descripcion: a.descripcion,
-    }));
-
-  const events = mapAgendaToEvents(agenda);
-
-  const handleGetByDate = async (date: string) =>
-    mapAgendaToEvents(await getByDate(date));
-
-  const handleGetByPatient = async (patientId: string) =>
-    mapAgendaToEvents(await getByPatient(patientId));
 
   if (isLoading)
     return (
       <View style={styles.feedback}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color={theme.colors.actionPrimary} />
         <Text style={styles.feedbackText}>Cargando agendas...</Text>
       </View>
     );
@@ -64,24 +31,24 @@ const AgendaScreen = () => {
   if (error)
     return (
       <View style={styles.feedback}>
-        <Text style={[styles.feedbackText, { color: "red" }]}>
-          Error al cargar agendas
-        </Text>
+        <Text style={styles.errorText}>Error al cargar agendas</Text>
       </View>
     );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Agenda de Psicólogos</Text>
-
       <AgendaForm onCreate={handleCreateAgenda} />
 
-      <CalenderView
-        events={events}
-        getByDate={handleGetByDate}
-        getByPatient={handleGetByPatient}
-        reload={() => {
-          void queryClient.invalidateQueries({ queryKey: ["agenda"] });
+      <CalendarView
+        events={agenda}
+        getByDate={getAgendaByDate}
+        reload={reload}
+        onSelectAgenda={(agendaData) => {
+          router.push({
+            pathname: "/AgendaFormEdicion",
+            params: { agenda: JSON.stringify(agendaData) },
+          });
         }}
       />
     </View>
@@ -90,27 +57,30 @@ const AgendaScreen = () => {
 
 export default AgendaScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#f9f9f9",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 12,
-    color: "#333",
-    textAlign: "center",
-  },
-  feedback: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  feedbackText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: "#555",
-  },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 16,
+      backgroundColor: theme.colors.background,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginBottom: 12,
+      color: theme.colors.textPrimary,
+      textAlign: "center",
+    },
+    feedback: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+    },
+    feedbackText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+    },
+    errorText: { marginTop: 10, fontSize: 16, color: theme.colors.error },
+  });

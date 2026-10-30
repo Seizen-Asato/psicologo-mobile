@@ -1,6 +1,6 @@
 # psicologo-mobile
 
-SPY CLINIC
+MIDORI
 
 Nuestro sistema esta orientado al nicho de los psicólogos para la implementación de una aplicación que brinde agilidad al registro de los pacientes mediante plantillas estandarizadas y personalizadas para el registro de pacientes y a su vez una autogestión de turnos con una agenda que agilice el registro de turnos y recomiende días disponibles para posibles sesiones al psicólogo y se le envíe un recordatorio automático al paciente.
 
@@ -31,43 +31,40 @@ Campo de búsqueda con autocompletado (para evitar errores de tipeo).
 
 Filtrado dinámico que muestra resultados mientras se escribe.
 
-## por hacer, recien empezando
+## Hecho
 
 --2 . Filtro de búsqueda por Letra de la A-Z y por Estado Paciente
 Permite consultar rápidamente el estado administrativo o clínico del paciente (ejemplo: autorizado, pendiente, en tratamiento activo, dado de alta).
 
+Card de cada paciente con boton de si asistio o no a la sesion.
 Filtro por estado en la lista de pacientes.
 
-Visualización con etiquetas de colores (verde = activo, amarillo = pendiente, rojo = dado de alta).
-
-Posibilidad de exportar listado filtrado.
-
-## por hacer recien empezando
+## Hecho
 
 --3 . Panel de gestión de agenda
 
 - Una vista donde el terapeuta define sus rangos de atención (ej. Lunes a Jueves de 14 a 19 hs), bloquea días por vacaciones o cancela/reprograma turnos existentes con un toque.
 
-## En progreso casi terminado, faltan algunos detalles por agregar y solcuionar pero el 75% de la diea esta, y esta diseñado para que a futuro se puedan ir agregando mas componentes que hacen falta pero en si la estructura esta
+## Hecho
 
---4 Plantillas de WhatsApp: Abre un chat con mensajes prearmados (recordatorio, demora, confirmación) sin tipear a mano.
+--4 DashBoard en donde se amrcan lso porcentajes de personas qeu asistieron y no, grafico en abse al procentaje y la cantdiad de turnso por amrcar si asistio o no.
 
-## por hacer no emepzado aun
+## Hecho
 
---5 Confirmación de Turno: Permite validar con un toque si el paciente asiste para asegurar la agenda del día.
+--5 Confirmación de Turno: Permite tener un seguimiento por apcinete de como viene asistiendo a las sesiones.
 
-## por hacer, no empezadoa aun
+## Hecho
 
 --6 Filtrado de turnos por fecha: en la agenda poens una fecha como parametro y se filtra mostrandose en el calendario.
 
-## Hecho, falta solcuionar problemas en si de la creacion de turnos pero la logica dle filtrado esta
-
-# Aviso
-
-## sabemos que lo features lo vamos a ir viendo clase por clase, pero como no nos quedo claro del todo la tarea que pedia listar los features, con el grupo decidimos estos 6 que implementaremos para la tesis pero no son fijos, los iremos analizando clase por clase
+## Hecho
 
 ---
 
 Estado del proyecto:
 
 -Arquitectura definida
+-Feature Listos
+-Estilos aplicados
+-Logo implementado
+-Falta un componente visual de carga

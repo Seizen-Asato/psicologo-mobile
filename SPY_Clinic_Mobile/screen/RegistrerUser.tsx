@@ -1,5 +1,3 @@
-//aun no se implemento, post examenes se implementara el registro
-
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -10,6 +8,8 @@ import {
   TextInput,
   View,
 } from "react-native";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
 import { UsuarioDto } from "../models/UsuarioDto";
 import { create } from "../services/UsuarioService";
 
@@ -24,6 +24,8 @@ export default function RegisterScreen() {
   });
 
   const router = useRouter();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
 
   const handleChange = (key: keyof UsuarioDto, value: string) => {
     setForm({ ...form, [key]: value });
@@ -50,18 +52,21 @@ export default function RegisterScreen() {
       <TextInput
         style={styles.input}
         placeholder="Nombre"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.name}
         onChangeText={(text) => handleChange("name", text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Apellido"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.lastName}
         onChangeText={(text) => handleChange("lastName", text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor={theme.colors.textDisabled}
         keyboardType="email-address"
         autoCapitalize="none"
         value={form.email}
@@ -70,6 +75,7 @@ export default function RegisterScreen() {
       <TextInput
         style={styles.input}
         placeholder="Contraseña"
+        placeholderTextColor={theme.colors.textDisabled}
         secureTextEntry
         value={form.password}
         onChangeText={(text) => handleChange("password", text)}
@@ -77,46 +83,58 @@ export default function RegisterScreen() {
       <TextInput
         style={styles.input}
         placeholder="Consultorio"
+        placeholderTextColor={theme.colors.textDisabled}
         value={form.consultorio ?? ""}
         onChangeText={(text) => handleChange("consultorio", text)}
       />
 
-      <Pressable style={styles.button} onPress={handleRegister}>
+      <Pressable
+        style={styles.button}
+        onPress={handleRegister}
+        accessibilityRole="button"
+        accessibilityLabel="Registrar usuario"
+      >
         <Text style={styles.buttonText}>Registrar</Text>
       </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#f9f9f9",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 12,
-    textAlign: "center",
-    color: "#333",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 12,
-    backgroundColor: "#fff",
-  },
-  button: {
-    backgroundColor: "#007bff",
-    padding: 12,
-    borderRadius: 6,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-});
+const makeStyles = (theme: DefaultTheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 16,
+      backgroundColor: theme.colors.background,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginBottom: 12,
+      textAlign: "center",
+      color: theme.colors.textPrimary,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderInput,
+      borderRadius: 6,
+      minHeight: 44,
+      padding: 12,
+      marginBottom: 12,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.textPrimary,
+    },
+    button: {
+      backgroundColor: theme.colors.actionPrimary,
+      minHeight: 44,
+      justifyContent: "center",
+      padding: 12,
+      borderRadius: 6,
+      alignItems: "center",
+    },
+    buttonText: {
+      color: theme.colors.onAction,
+      fontWeight: "bold",
+      fontSize: 16,
+    },
+  });

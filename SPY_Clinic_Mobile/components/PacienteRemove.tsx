@@ -8,6 +8,9 @@ import {
   View,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import type { DefaultTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
+import { DangerButton, SecondaryButtonLabel } from "../style/ui/Buttons";
 
 const getErrorMessage = (err: unknown) =>
   err instanceof Error ? err.message : String(err);
@@ -27,6 +30,9 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
   isLoading,
   error,
 }) => {
+  const theme = useTheme();
+  const styles = makeStyles(theme);
+
   const handleRemove = () => {
     Alert.alert(
       "Confirmar eliminación",
@@ -56,6 +62,9 @@ const PacienteRemove: React.FC<PacienteRemoveProps> = ({
           <Feather name="trash-2" size={20} color="#D9534F" />
         </Pressable>
       )}
+      {error ? (
+        <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>
+      ) : null}
 
       {error != null && (
         <Text style={styles.error}>Error: {getErrorMessage(error)}</Text>

@@ -1,8 +1,12 @@
 import { fetchApi } from "./apiClient";
 import { BASE_URL } from "./baseUrl";
 
+export async function getAll() {
+  return fetchApi(`${BASE_URL}/turno/todos`);
+}
+
 export async function getByRange(desde, hasta) {
-  return fetchApi(`${BASE_URL}/turno?desde=${desde}&hasta=${hasta}`);
+  return fetchApi(`${BASE_URL}/turno/range?desde=${desde}&hasta=${hasta}`);
 }
 
 export async function getById(id) {
@@ -17,7 +21,14 @@ export async function getTurnosByPaciente(id, pacienteId) {
   return fetchApi(`${BASE_URL}/turno/${id}/paciente/${pacienteId}`);
 }
 
+export async function getAttendance(anio, mes) {
+  return fetchApi(`${BASE_URL}/turno/asistencia?anio=${anio}&mes=${mes}`);
+}
+
 export async function create(data) {
+  console.log("URL:", `${BASE_URL}/turno`);
+  console.log("DATA:", data);
+
   return fetchApi(`${BASE_URL}/turno`, {
     method: "POST",
     body: JSON.stringify(data),
