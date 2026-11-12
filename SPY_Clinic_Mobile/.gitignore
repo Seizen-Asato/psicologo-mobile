@@ -46,3 +46,6 @@ app-example
 
 # agents
 .agents/
+
+# Graphify (archivos generados)
+graphify-out/
